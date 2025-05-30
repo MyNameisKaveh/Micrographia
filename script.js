@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const comparisonPlaceholderText = document.getElementById('comparisonPlaceholderText'); // New
     const filterStatus = document.getElementById('filterStatus'); // New
 
-    const API_BASE_URL = '/api'; 
+    const API_BASE_URL = "https://micrographia-kavehs-projects-7d3a910a.vercel.app"; 
 
     // --- Global State for Comparison ---
     let selectedForComparison = [];
@@ -115,10 +115,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         const gramFilterValue = gramFilterSelect ? gramFilterSelect.value : 'any';
-        let apiUrl = `${API_BASE_URL}/microbe/search?name=${encodeURIComponent(term)}`;
+        let endpointPath = `/api/microbe/search?name=${encodeURIComponent(term)}`;
 
         if (gramFilterValue !== 'any') {
-            apiUrl += `&gram_filter=${encodeURIComponent(gramFilterValue)}`;
+            endpointPath += `&gram_filter=${encodeURIComponent(gramFilterValue)}`;
             if (filterStatus) {
                 const filterText = gramFilterSelect.options[gramFilterSelect.selectedIndex].text;
                 filterStatus.textContent = `Filtered by: ${filterText}`;
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(apiUrl);
+            const response = await fetch(`${API_BASE_URL}${endpointPath}`);
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({ error: `HTTP error ${response.status}` }));
                 throw new Error(errorData.error || `Search failed with status: ${response.status}`);
@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (noImageText) noImageText.style.display = 'none';
 
         try {
-            const response = await fetch(`${API_BASE_URL}/microbe/detail?tax_id=${encodeURIComponent(taxId)}`);
+            const response = await fetch(`${API_BASE_URL}/api/microbe/detail?tax_id=${encodeURIComponent(taxId)}`);
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({ error: `HTTP error ${response.status}` }));
                 throw new Error(errorData.error || `Failed to fetch details with status: ${response.status}`);
@@ -449,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const taxIdsToCompare = selectedForComparison.map(item => item.tax_id);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/microbes/details`, {
+            const response = await fetch(`${API_BASE_URL}/api/microbes/details`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

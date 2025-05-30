@@ -281,8 +281,8 @@ html[dir="ltr"] #searchResultsContainer ul.search-results-list li input[type="ch
     font-size: 1.1em;
     text-align: center;
     padding: 20px;
-    background-color: #f8f9fa; /* Consistent with tray bg */
-    border: 1px dashed #ced4da; /* Dashed border for placeholder */
+    background-color: #f8f9fa; 
+    border: 1px dashed #ced4da; 
     border-radius: 6px;
 }
 
@@ -378,7 +378,7 @@ table.comparison-table td:first-child {
 }
 
 .info-card p, 
-.info-card div:not(#taxonomyLineage ul):not(#externalLinksList ul):not(.record-item) { /* Avoid double margin for record-item */
+.info-card div:not(#taxonomyLineage ul):not(#externalLinksList ul):not(.record-item):not(#biosampleRecordsList):not(#nuccoreRecordsList) {
     margin-bottom: 12px; 
     color: #495057; 
     line-height: 1.75; 
@@ -387,12 +387,13 @@ table.comparison-table td:first-child {
     margin-bottom: 0;
 }
 
-.info-card strong {
+.info-card strong { /* General strong tags within info cards */
     color: #212529; 
     font-weight: 600; 
 }
 
-.info-card p > strong {
+/* Specific styling for labels of TaxID, Gram Stain etc. if they are in <p><strong>Label:</strong> <span id="value"></span></p> structure */
+.info-card p > strong { /* Targets strong if it's a direct child of p, good for "Label: Value" pairs */
     margin-left: 5px; 
 }
 html[dir="ltr"] .info-card p > strong { 
@@ -401,26 +402,36 @@ html[dir="ltr"] .info-card p > strong {
 }
 
 /* Styling for Nuccore and BioSample record lists */
+#nuccoreRecordsListContainer p strong, /* Target the "Nuccore Records:" and "BioSample Records:" labels */
+#biosampleRecordsListContainer p strong {
+    display: block; /* Make the label take full width */
+    margin-bottom: 8px; /* Space below the label */
+    font-size: 1.05em; /* Slightly larger label */
+    color: #495057;
+}
+
 .record-item {
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #f1f3f5; /* Lighter border for items */
-    border-radius: 4px;
-    background-color: #f8f9fa; /* Slight background tint */
+    padding: 12px; /* Increased padding */
+    margin-bottom: 12px; /* Increased spacing */
+    border: 1px solid #e9ecef; /* Consistent light border */
+    border-radius: 6px; /* More rounded */
+    background-color: #fdfdff; /* Very light tint */
 }
 .record-item:last-child {
     margin-bottom: 0;
 }
 .record-item p {
-    margin-bottom: 5px !important; /* Override general p margin within card */
+    margin-bottom: 6px !important; 
     font-size: 0.95em;
+    line-height: 1.5; /* Adjust line height for record items */
 }
-.record-item p.record-title strong { /* Accession label */
-    color: #0056b3; /* Darker blue for accession label */
+.record-item p.record-title strong { 
+    color: #0056b3; 
 }
 .record-item a {
     color: #2980b9;
     text-decoration: none;
+    font-weight: 500; /* Make links slightly bolder */
 }
 .record-item a:hover {
     text-decoration: underline;
@@ -428,20 +439,21 @@ html[dir="ltr"] .info-card p > strong {
 }
 .record-item ul.attribute-list {
     list-style-type: none;
-    padding-right: 15px; /* Indent attributes */
-    margin-top: 5px;
+    padding-right: 15px; 
+    margin-top: 8px; /* Space above attribute list */
+    font-size: 0.9em; /* Smaller font for attributes */
 }
 html[dir="ltr"] .record-item ul.attribute-list {
     padding-left: 15px;
     padding-right: 0;
 }
 .record-item ul.attribute-list li {
-    font-size: 0.9em;
-    margin-bottom: 3px;
-    color: #495057;
+    margin-bottom: 4px; /* Tighter spacing for attributes */
+    color: #5a6268; /* Slightly lighter text for attributes */
 }
-.record-item ul.attribute-list li strong {
-    color: #343a40;
+.record-item ul.attribute-list li strong { /* Attribute names */
+    color: #495057;
+    font-weight: 600; /* Ensure attribute names are bold */
 }
 
 
@@ -565,8 +577,7 @@ footer a:hover {
         flex: none; 
         width: 100%;
     }
-    /* Search controls will stack due to default flex-direction: column for .search-controls */
-     .search-area { /* This was already column, ensure it remains so if .search-controls becomes row at a larger size not covered here */
+     .search-area { 
         flex-direction: column; 
         align-items: stretch; 
     }
@@ -574,12 +585,12 @@ footer a:hover {
         max-width: none; 
         width: 100%;
     }
-    .filter-area { /* Ensure filter area also stacks properly if not already covered by .search-controls */
+    .filter-area { 
         justify-content: flex-start; 
-        width: 100%; /* Take full width when stacked */
+        width: 100%; 
     }
-    .filter-area label { /* Ensure label and select are reasonably aligned when stacked */
-        margin-bottom: 5px; /* Add some space if they stack on top of each other */
+    .filter-area label { 
+        margin-bottom: 5px; 
     }
 
 
@@ -597,6 +608,16 @@ footer a:hover {
     }
     table.comparison-table th, table.comparison-table td {
         padding: 8px 10px;
+    }
+    .record-item { /* Adjust padding for record items on smaller screens */
+        padding: 10px;
+    }
+    .record-item ul.attribute-list { /* Adjust attribute list padding */
+        padding-right: 10px;
+    }
+    html[dir="ltr"] .record-item ul.attribute-list {
+        padding-left: 10px;
+        padding-right: 0;
     }
 }
 
@@ -638,6 +659,12 @@ footer a:hover {
     .comparison-actions button:not(:last-child) {
         margin-bottom: 10px; 
     }
+    .record-item p {
+        font-size: 0.9em; /* Slightly smaller text in records for very small screens */
+    }
+    .record-item ul.attribute-list {
+        font-size: 0.85em;
+    }
 
 }
 
@@ -657,8 +684,7 @@ html[dir="rtl"] #externalLinksList li::before {
 }
 
 html[dir="rtl"] .record-item ul.attribute-list {
-    padding-right: 15px; /* Indent attributes for RTL */
+    padding-right: 15px; 
     padding-left: 0;
 }
-
 ```
