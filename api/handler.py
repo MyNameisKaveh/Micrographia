@@ -5,7 +5,7 @@ import wikipedia
 import time
 import os
 import tempfile
-import xml.etree.ElementTree as ET 
+import xml.etree.ElementTree as ET
 import http.client # For IncompleteRead
 # Bio.Entrez is imported in configure_entrez_and_patch
 
@@ -103,38 +103,38 @@ def _call_entrez_with_retry(action_description, action_func, max_retries=3, base
     """
     Wrapper for executing a function that performs NCBI Entrez operations,
     with retry logic for IncompleteRead and EntrezError.
-    
+
     action_description: string, e.g., "fetching taxonomy details for TaxID X"
-    action_func: A no-argument function (e.g., a lambda) that executes the Entrez calls 
+    action_func: A no-argument function (e.g., a lambda) that executes the Entrez calls
                  (including handle opening, reading, and closing) and returns the parsed result.
     """
     last_exception = None
     for attempt in range(max_retries):
         try:
-            current_delay = base_delay_seconds + (attempt * base_delay_seconds * 2) 
+            current_delay = base_delay_seconds + (attempt * base_delay_seconds * 2)
             time.sleep(current_delay) # Apply delay before each attempt
-            
+
             result = action_func()
             return result
         except http.client.IncompleteRead as e:
             last_exception = e
             print(f"[RETRY_INCOMPLETE_READ] Attempt {attempt + 1}/{max_retries} for {action_description} failed: {e}. Retrying...")
-        except Entrez.EntrezError as e: 
+        except Entrez.EntrezError as e:
             last_exception = e
             print(f"[RETRY_ENTREZ_ERROR] Attempt {attempt + 1}/{max_retries} for {action_description} failed: {e}. Retrying...")
-        except Exception as e: 
+        except Exception as e:
             last_exception = e
             print(f"[ENTREZ_UNEXPECTED_ERR] Unexpected error during {action_description} on attempt {attempt + 1}: {e}")
-            if attempt >= max_retries -1 : 
-                 break 
-        
-        if attempt >= max_retries - 1: 
+            if attempt >= max_retries -1 :
+                 break
+
+        if attempt >= max_retries - 1:
             print(f"[ENTREZ_CALL_FINAL_FAIL] All {max_retries} attempts failed for {action_description}.")
-            break 
+            break
 
     if last_exception:
-        raise last_exception 
-    return None 
+        raise last_exception
+    return None
 
 
 # --- New NCBI Endpoints ---
@@ -158,14 +158,14 @@ def microbe_search_endpoint(): # Renamed to avoid confusion with any potential i
 
     if not search_term:
         return jsonify({"error": "Parameter 'name' is required."}), 400, COMMON_HEADERS
-    
+
     if gram_filter not in ['any', 'positive', 'negative']:
         return jsonify({"error": "Invalid 'gram_filter' value. Must be 'any', 'positive', or 'negative'."}), 400, COMMON_HEADERS
 
     initial_results_summary = []
     try:
         print(f"[NCBI_SEARCH_FILTER] Searching taxonomy for: {search_term}, Gram filter: {gram_filter}")
-        
+
         def action_esearch():
             # This specific Entrez call (esearch) might not typically cause IncompleteRead with Entrez.read
             # as Entrez.read is straightforward for esearch results.
@@ -180,7 +180,7 @@ def microbe_search_endpoint(): # Renamed to avoid confusion with any potential i
             return jsonify([]), 200, COMMON_HEADERS
 
         id_list = search_records["IdList"]
-        
+
         if gram_filter == 'any':
             def action_esummary():
                 handle = Entrez.esummary(db="taxonomy", id=",".join(id_list))
@@ -188,14 +188,14 @@ def microbe_search_endpoint(): # Renamed to avoid confusion with any potential i
                 handle.close()
                 return records
             summary_records = _call_entrez_with_retry(f"esummary for {len(id_list)} TaxIDs", action_esummary)
-            
+
             for record in summary_records:
                 initial_results_summary.append({
                     "scientific_name": record.get("ScientificName", "N/A"),
                     "tax_id": record.get("TaxId", record.get("Id", "N/A"))
                 })
             response = jsonify(initial_results_summary)
-            response.headers['Cache-Control'] = 'public, max-age=3600' 
+            response.headers['Cache-Control'] = 'public, max-age=3600'
             response.headers['Access-Control-Allow-Origin'] = '*'
             return response, 200
 
@@ -208,13 +208,13 @@ def microbe_search_endpoint(): # Renamed to avoid confusion with any potential i
             try:
                 details = _fetch_single_microbe_details(tax_id_str) # This function gets gram_stain_derived
                 gram_stain_derived = details.get("gram_stain_derived", "Not found").lower()
-                
+
                 match = False
                 if gram_filter == "positive" and "gram-positive" in gram_stain_derived:
                     match = True
                 elif gram_filter == "negative" and "gram-negative" in gram_stain_derived:
                     match = True
-                
+
                 if match:
                     filtered_results_summary.append({
                         "scientific_name": details.get("scientific_name", "N/A"),
@@ -230,7 +230,7 @@ def microbe_search_endpoint(): # Renamed to avoid confusion with any potential i
         response = jsonify(filtered_results_summary)
         # Filtered results might be cached for a similar duration, or less if data changes often.
         # For now, keeping it consistent.
-        response.headers['Cache-Control'] = 'public, max-age=3600' 
+        response.headers['Cache-Control'] = 'public, max-age=3600'
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response, 200
 
@@ -269,7 +269,7 @@ def parse_biosample_xml(xml_string):
                 if display_name and "gram" in display_name.lower(): # Check display names
                     if value and "positive" in value.lower(): gram_stain_found = "Gram-positive"
                     elif value and "negative" in value.lower(): gram_stain_found = "Gram-negative"
-            
+
             # Search within all attribute values for gram stain as a fallback
             if not gram_stain_found:
                 for attr_dict in sample_data["attributes"]:
@@ -330,21 +330,21 @@ def _fetch_single_microbe_details(tax_id):
                     if "aerobic" in comment_text: oxygen_requirement_general = "Aerobic"
                     elif "anaerobic" in comment_text: oxygen_requirement_general = "Anaerobic"
                     elif "facultative" in comment_text: oxygen_requirement_general = "Facultative" # Could be more specific
-    
+
     if gram_stain_general:
         result["gram_stain_taxonomy_comment"] = gram_stain_general # Keep specific source noted
 
     # 2. Find and Fetch Nuccore (Genome) Information
     print(f"[NCBI_DETAIL_FUNC] Fetching linked nuccore for TaxID: {tax_id}")
     MAX_NUCCORE_RECORDS = 5
-    
+
     def action_link_nuccore():
         handle = Entrez.elink(dbfrom="taxonomy", db="nuccore", id=tax_id, linkname="taxonomy_nuccore")
         links = Entrez.read(handle)
         handle.close()
         return links
     nuccore_links = _call_entrez_with_retry(f"elink nuccore for TaxID {tax_id}", action_link_nuccore)
-    
+
     result["genome_info"] = []
     if nuccore_links and nuccore_links[0].get("LinkSetDb"):
         nuccore_ids = [link["Id"] for link in nuccore_links[0]["LinkSetDb"][0]["Link"]]
@@ -355,14 +355,14 @@ def _fetch_single_microbe_details(tax_id):
                 handle.close()
                 return summaries
             nuc_summaries = _call_entrez_with_retry(f"esummary nuccore for {len(nuccore_ids)} IDs (max 20 checked for ref)", action_summarize_nuccore)
-            
+
             ref_genome_summary = None
             for rec in nuc_summaries:
                 title = rec.get("Title", "").lower()
                 if "reference genome" in title or "representative genome" in title:
                     ref_genome_summary = rec
                     break
-            
+
             selected_summaries = []
             if ref_genome_summary:
                 selected_summaries = [ref_genome_summary]
@@ -388,7 +388,7 @@ def _fetch_single_microbe_details(tax_id):
     # 3. Find and Fetch BioSample Information
     print(f"[NCBI_DETAIL_FUNC] Fetching linked biosample for TaxID: {tax_id}")
     MAX_BIOSAMPLE_RECORDS = 3
-    
+
     def action_link_biosample():
         handle = Entrez.elink(dbfrom="taxonomy", db="biosample", id=tax_id, linkname="taxonomy_biosample")
         links = Entrez.read(handle)
@@ -402,48 +402,65 @@ def _fetch_single_microbe_details(tax_id):
         if biosample_ids:
             def action_fetch_biosample():
                 handle = Entrez.efetch(db="biosample", id=",".join(biosample_ids), retmode="xml")
-                xml_data = handle.read() 
+                xml_data = handle.read()
                 handle.close()
                 return xml_data
             biosample_xml_data = _call_entrez_with_retry(f"efetch biosample for {len(biosample_ids)} IDs", action_fetch_biosample)
 
             if biosample_xml_data:
-                if isinstance(biosample_xml_data, bytes):
-                    biosample_xml_data = biosample_xml_data.decode('utf-8')
-                
-                try:
-                    root_node_str = f"<BioSampleSet>{biosample_xml_data}</BioSampleSet>" 
-                    parsed_biosamples_root = ET.fromstring(root_node_str)
-                    # Loop must be inside the try block that creates parsed_biosamples_root
-                    for sample_node in parsed_biosamples_root.findall('BioSample'):
-                        sample_xml_str = ET.tostring(sample_node, encoding='unicode')
-                        parsed_sample_data = parse_biosample_xml(sample_xml_str) # This helper already looks for Gram stain
-                        
-                        # Stretch goal: Oxygen requirement from BioSample attributes
-                        if not oxygen_requirement_general and parsed_sample_data.get("attributes"):
-                            for attr in parsed_sample_data["attributes"]:
-                                attr_name_lower = attr.get("name", "").lower()
-                                attr_val_lower = attr.get("value", "").lower()
-                                if "oxygen" in attr_name_lower or "aerobic" in attr_name_lower or "anaerobic" in attr_name_lower:
-                                    if "aerobic" in attr_val_lower: oxygen_requirement_general = "Aerobic"
-                                    elif "anaerobic" in attr_val_lower: oxygen_requirement_general = "Anaerobic"
-                                    elif "facultative" in attr_val_lower: oxygen_requirement_general = "Facultative"
-                                    elif "microaerophilic" in attr_val_lower: oxygen_requirement_general = "Microaerophilic"
-                                    break 
-                        
-                        if parsed_sample_data:
-                            result["biosample_info"].append(parsed_sample_data)
-                            if not gram_stain_general and "gram_stain_biosample" in parsed_sample_data:
-                                gram_stain_general = parsed_sample_data["gram_stain_biosample"]
-                except ET.ParseError as pe_multi:
-                    print(f"[BIOSAMPLE_MULTI_PARSE_ERR] XML Parse Error for BioSampleSet TaxID {tax_id}: {pe_multi}")
-                except Exception as e_bs_parse: # Catch any other error during biosample parsing
-                    print(f"[BIOSAMPLE_GENERIC_PARSE_ERR] Error parsing BioSample XML for TaxID {tax_id}: {e_bs_parse}")
-            
-    
+                    try:
+                        if isinstance(biosample_xml_data, bytes):
+                            biosample_xml_data = biosample_xml_data.decode('utf-8')
+
+                        # Ensure the XML string is wrapped in a single root element
+                        if not biosample_xml_data.strip().startswith('<BioSampleSet>'):
+                            root_node_str = f"<BioSampleSet>{biosample_xml_data.strip()}</BioSampleSet>"
+                        else:
+                            root_node_str = biosample_xml_data.strip()
+
+                        # Proceed only if root_node_str is not empty after stripping
+                        if not root_node_str:
+                            print(f"[BIOSAMPLE_XML_EMPTY] BioSample XML data was empty or whitespace for TaxID {tax_id}")
+                        else:
+                            parsed_biosamples_root = ET.fromstring(root_node_str)
+
+                            for sample_node in parsed_biosamples_root.findall('BioSample'):
+                                # This is Indentation Level 1 relative to the 'for sample_node...'
+                                sample_xml_str_for_parser = ET.tostring(sample_node, encoding='unicode')
+                                parsed_sample_data = parse_biosample_xml(sample_xml_str_for_parser)
+
+                                if parsed_sample_data: # Ensure parse_biosample_xml returned something
+                                    # Oxygen requirement logic - Indentation Level 1
+                                    if not oxygen_requirement_general and parsed_sample_data.get("attributes"):
+                                        for attr in parsed_sample_data["attributes"]: # Indentation Level 2
+                                            attr_name_lower = attr.get("name", "").lower()
+                                            attr_val_lower = attr.get("value", "").lower()
+                                            if "oxygen" in attr_name_lower or "aerobic" in attr_name_lower or "anaerobic" in attr_name_lower: # Indentation Level 3
+                                                if "aerobic" in attr_val_lower: # Indentation Level 4
+                                                    oxygen_requirement_general = "Aerobic"
+                                                elif "anaerobic" in attr_val_lower: # Indentation Level 4
+                                                    oxygen_requirement_general = "Anaerobic"
+                                                elif "facultative" in attr_val_lower: # Indentation Level 4
+                                                    oxygen_requirement_general = "Facultative"
+                                                elif "microaerophilic" in attr_val_lower: # Indentation Level 4
+                                                    oxygen_requirement_general = "Microaerophilic"
+
+                                                if oxygen_requirement_general: # Indentation Level 4
+                                                    break # Found one for this sample, exit inner attribute loop
+
+                                    # Appending biosample_info and updating gram_stain_general - Indentation Level 1
+                                    result["biosample_info"].append(parsed_sample_data)
+                                    if not gram_stain_general and "gram_stain_biosample" in parsed_sample_data: # Indentation Level 2
+                                        gram_stain_general = parsed_sample_data["gram_stain_biosample"] # Indentation Level 3
+
+                    except ET.ParseError as pe_xml: # Specific to XML parsing
+                        print(f"[BIOSAMPLE_XML_PARSE_ERR] XML Parse Error for BioSampleSet (TaxID {tax_id}): {pe_xml}")
+                    except Exception as e_bs_proc: # Catch any other error during biosample processing
+                        print(f"[BIOSAMPLE_PROC_ERR] Error processing BioSample XML/data for TaxID {tax_id}: {e_bs_proc}")
+
     # Consolidate Gram stain and Oxygen requirement
     result["gram_stain_derived"] = gram_stain_general if gram_stain_general else "Not found"
-                        
+
                         # Stretch goal: Oxygen requirement from BioSample attributes
                         if not oxygen_requirement_general and parsed_sample_data.get("attributes"):
                             for attr in parsed_sample_data["attributes"]:
@@ -454,8 +471,8 @@ def _fetch_single_microbe_details(tax_id):
                                     elif "anaerobic" in attr_val_lower: oxygen_requirement_general = "Anaerobic"
                                     elif "facultative" in attr_val_lower: oxygen_requirement_general = "Facultative"
                                     elif "microaerophilic" in attr_val_lower: oxygen_requirement_general = "Microaerophilic"
-                                    break 
-                        
+                                    break
+
                         if parsed_sample_data:
                             result["biosample_info"].append(parsed_sample_data)
                             if not gram_stain_general and "gram_stain_biosample" in parsed_sample_data:
@@ -465,11 +482,11 @@ def _fetch_single_microbe_details(tax_id):
                     # Optionally, add a placeholder or error indicator to result["biosample_info"]
                 except Exception as e_bs_parse: # Catch any other error during biosample parsing
                     print(f"[BIOSAMPLE_GENERIC_PARSE_ERR] Error parsing BioSample XML for TaxID {tax_id}: {e_bs_parse}")
-            
-    
+
+
     # Consolidate Gram stain and Oxygen requirement
     result["gram_stain_derived"] = gram_stain_general if gram_stain_general else "Not found"
-                
+
                 # Stretch goal: Oxygen requirement from BioSample attributes
                 if not oxygen_requirement_general and parsed_sample_data.get("attributes"):
                     for attr in parsed_sample_data["attributes"]:
@@ -481,16 +498,16 @@ def _fetch_single_microbe_details(tax_id):
                             elif "facultative" in attr_val_lower: oxygen_requirement_general = "Facultative"
                             elif "microaerophilic" in attr_val_lower: oxygen_requirement_general = "Microaerophilic"
                             break # Found one, stop for this sample
-                
+
                 if parsed_sample_data:
                     result["biosample_info"].append(parsed_sample_data)
                     if not gram_stain_general and "gram_stain_biosample" in parsed_sample_data:
                         gram_stain_general = parsed_sample_data["gram_stain_biosample"]
-    
+
     # Consolidate Gram stain and Oxygen requirement
     result["gram_stain_derived"] = gram_stain_general if gram_stain_general else "Not found"
     result["oxygen_requirement_derived"] = oxygen_requirement_general if oxygen_requirement_general else "Not found"
-    
+
     # Extract primary isolation source for comparison view (simplified)
     primary_isolation_source = "N/A"
     if result["biosample_info"]:
@@ -553,13 +570,13 @@ def microbes_details_batch():
 
     if not request.is_json:
         return jsonify({"error": "Request must be JSON."}), 400, COMMON_HEADERS
-    
+
     data = request.get_json()
     tax_ids = data.get('tax_ids')
 
     if not tax_ids or not isinstance(tax_ids, list):
         return jsonify({"error": "Parameter 'tax_ids' must be a list."}), 400, COMMON_HEADERS
-    
+
     if not tax_ids: # Empty list check
         return jsonify({"error": "'tax_ids' list cannot be empty."}), 400, COMMON_HEADERS
 
@@ -583,11 +600,11 @@ def microbes_details_batch():
             errors_encountered[tax_id] = f"Unexpected server error: {str(e)}"
             # Optionally, re-raise if one failure should stop the whole batch:
             # return jsonify({"error": f"Server error processing TaxID {tax_id}: {str(e)}"}), 500, COMMON_HEADERS
-    
+
     response_data = {"results": all_details}
     if errors_encountered:
         response_data["errors"] = errors_encountered
-        
+
     response = jsonify(response_data)
     response.headers['Cache-Control'] = 'public, max-age=86400' # 1 day, same as single detail
     response.headers['Access-Control-Allow-Origin'] = '*'
@@ -651,7 +668,7 @@ def get_wikipedia_data(species_name_from_user, scientific_name_from_gbif=None):
     processed_search_terms = set()
     
     if clean_scientific_name and clean_scientific_name not in processed_search_terms:
-        search_candidates.insert(0, clean_scientific_name) 
+        search_candidates.insert(0, clean_scientific_name)
 
     page_found_for_summary = False
 
@@ -694,7 +711,7 @@ def get_wikipedia_data(species_name_from_user, scientific_name_from_gbif=None):
                                  summary_text = summary_text_longer
                         
                         wiki_data['summary'] = summary_text
-                        page_found_for_summary = True 
+                        page_found_for_summary = True
                         print(f"[WIKI_DATA] Summary found for '{page_title_for_summary}'.")
                     except wikipedia.exceptions.DisambiguationError as de_summ:
                         print(f"[WIKI_SUMM_ERR] DisambiguationError for summary '{page_title_for_summary}': {de_summ.options[:2]}")
@@ -721,13 +738,13 @@ def get_wikipedia_data(species_name_from_user, scientific_name_from_gbif=None):
                                     score += 3
                                 if pk_word == clean_scientific_name_for_filename and pk_word in filename_part:
                                     score += 5
-                        if "taxobox" in img_url_lower: score += 2 
+                        if "taxobox" in img_url_lower: score += 2
                         if img_url_lower.endswith('.svg'): score -= 1
                         candidate_images_with_scores.append({'url': img_url, 'score': score})
                     
                     if candidate_images_with_scores:
                         sorted_images = sorted(candidate_images_with_scores, key=lambda x: x['score'], reverse=True)
-                        if sorted_images and sorted_images[0]['score'] >= 0: 
+                        if sorted_images and sorted_images[0]['score'] >= 0:
                             best_image_url = sorted_images[0]['url']
                             if best_image_url.startswith("//"): best_image_url = "https:" + best_image_url
                             wiki_data['imageUrl'] = best_image_url
@@ -743,8 +760,8 @@ def get_wikipedia_data(species_name_from_user, scientific_name_from_gbif=None):
 
         except wikipedia.exceptions.DisambiguationError as e:
             print(f"[WIKI_DATA_ERR] DisambiguationError for '{term_to_search}': {e.options[:2]}")
-            if e.options and not page_found_for_summary : 
-                for option in e.options[:2]: 
+            if e.options and not page_found_for_summary :
+                for option in e.options[:2]:
                      if option not in processed_search_terms and option not in search_candidates:
                         search_candidates.append(option)
         except wikipedia.exceptions.PageError:
@@ -766,7 +783,7 @@ def get_best_ncbi_suggestion_flexible(common_name, max_ids_to_check=5):
         return None
     try:
         search_term = f"{common_name}[Common Name] OR {common_name}[Organism]"
-        
+
         def action_suggest_esearch1():
             h = Entrez.esearch(db="taxonomy", term=search_term, retmax=max_ids_to_check, sort="relevance")
             r = Entrez.read(h)
@@ -856,7 +873,7 @@ def main_handler(path=None):
         # Broader CORS for this specific pre-existing endpoint if it needs to support POST etc.
         main_cors_headers = {**COMMON_HEADERS, 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With', 'Access-Control-Max-Age': '3600'}
         return ('', 204, main_cors_headers)
-        
+
     species_name_query = ""
     if request.method == 'GET': species_name_query = request.args.get('name')
     elif request.method == 'POST':
@@ -865,9 +882,9 @@ def main_handler(path=None):
             if data_post: species_name_query = data_post.get('name')
             else: return jsonify({"error": "درخواست نامعتبر: بدنه JSON خالی."}), 400, COMMON_HEADERS
         except: return jsonify({"error": "خطا در خواندن بدنه JSON."}), 400, COMMON_HEADERS
-    
+
     if not species_name_query: return jsonify({"error": "پارامتر 'name' نیاز است."}), 400, COMMON_HEADERS
-    
+
     params_gbif = {"name": species_name_query, "verbose": "true"}
     classification_data = {}
     gbif_error_message = None
@@ -912,14 +929,14 @@ def main_handler(path=None):
         if final_data.get("imageUrl") or final_data.get("wikipediaSummary"):
             # This endpoint (original main_handler) can also have caching if desired, e.g. 1 hour
             response = jsonify({"message": gbif_error_message, **final_data})
-            # response.headers['Cache-Control'] = 'public, max-age=3600' 
+            # response.headers['Cache-Control'] = 'public, max-age=3600'
             response.headers['Access-Control-Allow-Origin'] = '*'
             return response, 200 # 200 because we have some data
         return jsonify({"message": gbif_error_message, "searchedName": species_name_query}), 404, COMMON_HEADERS
 
     if not final_data.get("scientificName") and not final_data.get("imageUrl") and not final_data.get("wikipediaSummary") and not gbif_error_message :
         return jsonify({"message": f"اطلاعاتی برای '{species_name_query}' یافت نشد."}), 404, COMMON_HEADERS
-    
+
     # This endpoint (original main_handler) can also have caching if desired, e.g. 1 hour
     response = jsonify(final_data)
     # response.headers['Cache-Control'] = 'public, max-age=3600'
