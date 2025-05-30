@@ -3,77 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>کاوشگر اطلاعات موجودات</title> <!-- عنوان تغییر کرد -->
+    <title>MicrobeScope Explorer</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>کاوشگر اطلاعات موجودات</h1> <!-- عنوان تغییر کرد -->
-            <p>نام رایج یک موجود را برای دریافت پیشنهاد نام علمی وارد کنید، یا نام علمی آن را برای مشاهده طبقه‌بندی دقیق و تصویر جستجو نمایید.</p> <!-- متن تغییر کرد -->
+            <h1>MicrobeScope Explorer</h1>
+            <div class="search-controls">
+                <div class="search-area">
+                    <input type="text" id="microbeSearchInput" placeholder="Enter microbe name (e.g., Bacillus subtilis)...">
+                    <button id="searchButton">Search</button>
+                </div>
+                <div class="filter-area">
+                    <label for="gramFilterSelect">Filter by Gram Stain:</label>
+                    <select id="gramFilterSelect">
+                        <option value="any" selected>Any</option>
+                        <option value="positive">Gram-Positive</option>
+                        <option value="negative">Gram-Negative</option>
+                    </select>
+                </div>
+            </div>
+            <div id="filterStatus" class="filter-status-display" style="display: none; margin-top: 10px;">
+                <!-- Filter status will be populated here -->
+            </div>
+            <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+                <p>Loading...</p>
+            </div>
+            <div id="errorContainer" class="error-message-container" style="display: none;"></div>
+            <div id="searchResultsContainer" class="search-results-display">
+                <!-- Search results/suggestions will be populated here by JavaScript -->
+            </div>
         </header>
 
-        <main>
-            <!-- بخش جدید برای پیشنهاد نام علمی -->
-            <div class="suggestion-box">
-                <h2>کمک برای یافتن نام علمی (NCBI)</h2> <!-- عنوان تغییر کرد -->
-                <div class="search-box">
-                    <input type="text" id="commonNameInput" placeholder="مثلاً: Cat یا Lion"> <!-- Placeholder تغییر کرد -->
-                    <button id="suggestNameButton">دریافت پیشنهاد</button>
+        <section id="comparisonTrayArea" style="display: none;">
+            <h3>Selected for Comparison:</h3>
+            <ul id="comparisonSelectedList">
+                <!-- Selected items will be populated here -->
+            </ul>
+            <div class="comparison-actions">
+                <button id="compareSelectedButton" disabled>Compare Selected (<span id="comparisonCount">0</span>)</button>
+                <button id="clearComparisonButton">Clear Selection</button>
+            </div>
+        </section>
+
+        <main id="microbeDetailSection" style="display: none;">
+            <div class="microbe-header">
+                <h1 id="microbeScientificName"></h1>
+                <p id="microbeRank" class="rank-display"></p>
+            </div>
+
+            <div class="content-wrapper">
+                <div class="main-info-column">
+                    <div class="info-card" id="summaryCard">
+                        <h2>Summary</h2>
+                        <div id="microbeDescription">
+                            <!-- Microbe description from API -->
+                        </div>
+                        <!-- Placeholder for multiple BioSample records -->
+                        <div id="biosampleRecordsListContainer">
+                             <p><strong>BioSample Records:</strong></p>
+                             <div id="biosampleRecordsList">
+                                 <!-- BioSample records will be listed here -->
+                             </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card" id="taxonomyCard">
+                        <h2>Taxonomy</h2>
+                        <p><strong>NCBI TaxID:</strong> <span id="ncbiTaxId">N/A</span></p> <!-- Will be made a link by JS -->
+                        <div id="taxonomyLineage">
+                            <!-- Taxonomy lineage from API -->
+                        </div>
+                    </div>
+
+                    <div class="info-card" id="morphologyCard">
+                        <h2>Morphology & Physiology</h2>
+                        <p><strong>Gram Stain:</strong> <span id="gramStain">N/A</span></p>
+                        <p><strong>Cell Shape:</strong> <span id="cellShape">N/A</span></p>
+                        <p><strong>Oxygen Requirement:</strong> <span id="oxygenRequirement">N/A</span></p>
+                    </div>
+
+                    <div class="info-card" id="genomicsCard">
+                        <h2>Genomics</h2>
+                        <!-- Placeholder for multiple Nuccore records -->
+                        <div id="nuccoreRecordsListContainer">
+                            <p><strong>Nuccore Records:</strong></p>
+                            <div id="nuccoreRecordsList">
+                                <!-- Nuccore records will be listed here -->
+                            </div>
+                        </div>
+                        <p style="margin-top: 10px;"><strong>GC Content:</strong> <span id="gcContent">N/A</span></p>
+                    </div>
                 </div>
-                <div id="suggestionLoadingIndicator" style="display: none;">
-                    <p>کمی صبر کنید، در حال یافتن نام علمی...</p> <!-- متن تغییر کرد -->
+
+                <div class="sidebar-column">
+                    <div class="info-card" id="imageCard">
+                        <h2>Image</h2>
+                        <img id="microbeImage" src="#" alt="Microbe Image" style="display:none; max-width: 100%; border-radius: 4px;">
+                        <p id="noImageText" style="display: none; text-align:center;">Image not available.</p>
+                    </div>
+
+                    <div class="info-card" id="linksCard">
+                        <h2>External Links</h2>
+                        <ul id="externalLinksList">
+                            <!-- Links will be populated by JavaScript -->
+                        </ul>
+                    </div>
                 </div>
-                <div id="suggestionResultContainer" style="margin-top: 15px;">
-                    <!-- نتایج پیشنهاد اینجا نمایش داده می‌شوند -->
-                </div>
-            </div>
-
-            <hr class="section-divider"> 
-
-            <!-- بخش جستجوی اصلی (موجود) -->
-            <div class="main-search-box">
-                <h2>کاوش اطلاعات و طبقه‌بندی (GBIF و Wikipedia)</h2> <!-- عنوان تغییر کرد -->
-                <div class="search-box">
-                    <input type="text" id="speciesNameInput" placeholder="مثلاً: Panthera leo یا Homo sapiens"> <!-- Placeholder تغییر کرد -->
-                    <button id="searchButton">جستجو</button>
-                </div>
-                <div id="autocompleteSuggestions" class="autocomplete-suggestions-container"></div> <!-- NEW -->
-            </div>
-
-            <div id="loadingIndicator" style="display: none;">
-                <p>در حال دریافت اطلاعات، لطفاً شکیبا باشید...</p> <!-- متن تغییر کرد -->
-            </div>
-
-            <div id="speciesImageContainer" style="text-align: center; margin-bottom: 20px;">
-                <!-- تصویر اینجا توسط جاوااسکریپت بارگذاری می‌شود -->
-            </div>
-
-            <div id="resultsContainer">
-                <!-- نتایج جستجو اینجا نمایش داده خواهند شد -->
-            </div>
-
-            <div id="errorContainer" style="display: none;">
-                <!-- پیام‌های خطا اینجا نمایش داده خواهند شد -->
-            </div>
-
-            <div class="search-history-container"> <!-- NEW CONTAINER -->
-                <h3>آخرین جستجوها</h3>
-                <ul id="searchHistoryList">
-                    <!-- History items will be populated by JavaScript -->
-                </ul>
-                <button id="clearHistoryButton">پاک کردن تاریخچه</button>
             </div>
         </main>
 
+        <section id="comparisonDisplayArea" style="display: none;">
+            <h2>Microbe Comparison</h2>
+            <div id="comparisonTableContainer">
+                <p id="comparisonPlaceholderText" class="placeholder-text">Select at least two microbes from the search results to compare them here.</p>
+                <!-- Comparison table will be rendered here by JavaScript -->
+            </div>
+        </section>
+
         <footer>
-            <p>ساخته شده با استفاده از 
-                <a href="https://www.gbif.org/developer/summary" target="_blank">GBIF API</a> و 
-                <a href="https://www.ncbi.nlm.nih.gov/books/NBK25497/" target="_blank">NCBI Entrez</a>
-            </p>
+            <p>Powered by NCBI E-utilities. Developed by Jules.</p>
         </footer>
     </div>
-
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
 </body>
 </html>

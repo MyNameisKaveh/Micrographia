@@ -1,389 +1,664 @@
-@import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
-
-/* General Body Styles */
-body {
-    font-family: 'Vazirmatn', 'Roboto', sans-serif;
-    line-height: 1.7;
+/* Basic Reset & Global Box Sizing */
+*,
+*::before,
+*::after {
     margin: 0;
-    padding: 20px;
-    background-color: #F8F9FA; /* Light Gray */
-    color: #212529; /* Dark Gray */
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Vazirmatn', 'Roboto', Arial, sans-serif;
+    line-height: 1.7; 
+    background-color: #f8f9fa; 
+    color: #343a40; 
     direction: rtl;
+    padding: 15px;
+    font-size: 16px; 
 }
 
 .container {
-    max-width: 750px; /* Increased max-width */
-    margin: 30px auto;
-    padding: 25px; /* Increased padding */
-    background-color: #FFFFFF; /* White */
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* More subtle box-shadow */
+    max-width: 1200px;
+    margin: 25px auto; 
+    padding: 25px;    
+    background-color: #ffffff;
+    border-radius: 10px; 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); 
 }
 
+/* Header and Search Area */
 header {
     text-align: center;
-    margin-bottom: 30px;
-    border-bottom: 1px solid #DEE2E6; /* Lighter gray border */
-    padding-bottom: 20px;
+    margin-bottom: 35px; 
+    padding-bottom: 25px; 
+    border-bottom: 1px solid #dee2e6; 
 }
 
 header h1 {
-    margin-bottom: 0.5em;
-    color: #264653; /* Dark Blue/Green */
-}
-
-header p {
-    font-size: 0.95em;
-    color: #6C757D; /* Lighter Gray */
-}
-
-main {
-    text-align: right;
-}
-
-/* Styles for both search boxes */
-.search-box {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.search-box input[type="text"] {
-    flex-grow: 1;
-    padding: 10px 15px;
-    border: 1px solid #CED4DA; /* Updated border color */
-    border-radius: 4px;
-    font-size: 1em;
-    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Updated transition */
-}
-
-.search-box input[type="text"]:focus {
-    border-color: #2A9D8F; /* Teal border on focus */
-    box-shadow: 0 0 0 0.2rem rgba(42, 157, 143, 0.25); /* Subtle box-shadow on focus */
-}
-
-.search-box button {
-    padding: 10px 20px;
-    background-color: #2A9D8F; /* Teal */
-    color: white;
-    border: none;
-    border-radius: 6px; /* Slightly more rounded */
-    cursor: pointer;
-    font-size: 1em;
-    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-}
-
-.search-box button:hover {
-    background-color: #248B7E; /* Slightly darker Teal for hover */
-    transform: translateY(-1px); /* Subtle lift effect */
-}
-
-.search-box button:active {
-    transform: scale(0.98); /* Click effect */
-}
-
-/* Suggestion Box Specific Styles */
-.suggestion-box {
-    padding: 25px; /* Increased padding */
-    background-color: #FFFFFF; /* White */
-    border: 1px solid #DEE2E6; /* Updated border color */
-    border-radius: 8px;
+    font-size: 2.2em; 
+    color: #2c3e50; 
     margin-bottom: 25px; 
 }
 
-.suggestion-box h2 {
-    margin-top: 0;
-    color: #264653; /* Dark Blue/Green */
-    text-align: center;
-    margin-bottom: 15px;
-    font-size: 1.3em;
-}
-
-#suggestionLoadingIndicator p {
-    color: #007BFF; /* Blue for suggestion loading */
-    text-align: center;
-    padding: 10px;
-    margin-top: 10px;
-}
-
-#suggestionResultContainer p {
-    padding: 12px 15px;
-    border-radius: 4px;
-    margin: 0;
-    text-align: center;
-}
-
-#suggestionResultContainer .suggested-name-success {
-    background-color: #D1FAE5; /* Lighter success green background */
-    border: 1px solid #A7F3D0; /* Lighter success green border */
-    color: #065F46; /* Darker success green text */
+.search-controls {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column; /* Stack search and filter by default */
+    gap: 15px; /* Space between search and filter areas */
+    margin-bottom: 15px;
 }
 
-#suggestionResultContainer .suggestion-message-info {
-    color: #075985; /* Darker info blue text */
-    background-color: #E0F2FE; /* Lighter info blue background */
-    border: 1px solid #BAE6FD; /* Lighter info blue border */
+.search-area {
+    display: flex;
+    /* Default: input and button are full width due to stacking */
+    gap: 10px; 
 }
 
-#suggestionResultContainer .suggestion-message-error {
-    background-color: #FEE2E2; /* Lighter error red background */
-    color: #991B1B; /* Darker error red text */
-    border: 1px solid #FECACA; /* Lighter error red border */
+#microbeSearchInput {
+    flex-grow: 1; /* Take available space */
+    padding: 14px 18px; 
+    border: 1px solid #ced4da; 
+    border-radius: 6px; 
+    font-size: 1.05em; 
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
+#microbeSearchInput::placeholder {
+    color: #6c757d; 
+}
 
-.copy-to-main-search-btn {
-    padding: 8px 15px; /* Adjusted padding */
-    background-color: #E9C46A; /* Yellow accent */
-    color: #212529; /* Dark Gray text for better contrast */
+#microbeSearchInput:focus {
+    border-color: #4dabf7; 
+    box-shadow: 0 0 0 0.2rem rgba(77, 171, 247, 0.25);
+}
+
+#searchButton {
+    padding: 14px 25px; /* Adjusted for consistency */
+    background-color: #3498db;
+    color: white;
     border: none;
-    border-radius: 6px; /* Slightly more rounded */
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 0.9em;
-    margin-right: auto; 
-    margin-left: 10px; 
-    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+    font-size: 1.05em;
+    transition: background-color 0.2s, transform 0.1s;
+    flex-shrink: 0; /* Prevent button from shrinking too much */
 }
 
-.copy-to-main-search-btn:hover {
-    background-color: #DFAF5B; /* Darker Yellow for hover */
-    transform: translateY(-1px); /* Subtle lift effect */
+.filter-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center; /* Center filter area content */
 }
 
-.copy-to-main-search-btn:active {
-    transform: scale(0.98); /* Click effect */
-}
-
-/* Divider */
-.section-divider {
-    margin: 35px 0;
-    border: 0;
-    border-top: 1px solid #E9ECEF; /* Lighter divider */
-}
-
-/* Main Search Box Section Title */
-.main-search-box {
-    position: relative; /* For positioning autocomplete suggestions */
-}
-
-.main-search-box h2 {
-    margin-top: 0;
-    color: #264653; /* Dark Blue/Green */
-    text-align: center;
-    margin-bottom: 15px;
-    font-size: 1.3em;
-}
-
-/* Autocomplete Suggestions Container for Main Search */
-#autocompleteSuggestions {
-    display: none; /* Hidden by default, shown by JS */
-    position: absolute;
-    background-color: #FFFFFF; /* White */
-    border: 1px solid #DEE2E6; /* Light gray border, from palette */
-    border-top: none; /* Sits directly under the input field's container */
-    max-height: 200px;
-    overflow-y: auto;
-    /* 
-      Width is calc(100% - 2px) relative to .main-search-box, 
-      accounting for its own 1px left and 1px right border.
-      This makes it span the full width of the .main-search-box parent.
-    */
-    width: calc(100% - 2px); 
-    left: 0; /* Align with parent's left edge */
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
-    z-index: 1000; /* To appear above other elements */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    border-radius: 0 0 4px 4px; /* Rounded bottom corners */
-    /*
-      The .search-box (which contains the input) is a sibling element to this one
-      in the DOM structure (both are children of .main-search-box, with #autocompleteSuggestions
-      following .search-box).
-      .search-box has margin-bottom: 20px.
-      To make #autocompleteSuggestions appear directly under the .search-box,
-      this margin needs to be counteracted.
-      Setting margin-top to -20px should pull #autocompleteSuggestions up to be flush 
-      with the bottom of .search-box.
-    */
-    margin-top: -20px; 
-}
-
-/* Individual Autocomplete Suggestion Item (assuming they are divs) */
-#autocompleteSuggestions div {
-    padding: 10px;
-    cursor: pointer;
+.filter-area label {
     font-size: 0.95em;
-    color: #212529; /* Dark Gray text, from palette */
-    border-bottom: 1px solid #E9ECEF; /* Light separator line, from palette */
+    color: #495057;
 }
 
-#autocompleteSuggestions div:last-child {
-    border-bottom: none; /* No border for the last item */
-}
-
-/* Hover effect for Autocomplete Suggestion Item */
-#autocompleteSuggestions div:hover {
-    background-color: #F8F9FA; /* Light Gray hover, from palette */
-    color: #2A9D8F; /* Teal text on hover for emphasis, from palette */
-}
-
-/* Loading Indicator for main search */
-#loadingIndicator p { 
-    color: #2A9D8F; /* Teal */
-    text-align: center;
-    padding: 15px;
-    margin-top: 20px;
-}
-
-/* Error Container for main search */
-#errorContainer {
-    background-color: #FEE2E2; /* Lighter error red background */
-    color: #991B1B; /* Darker error red text */
-    border: 1px solid #FECACA; /* Lighter error red border */
-    text-align: center;
-    padding: 15px;
-    margin-top: 20px;
+#gramFilterSelect {
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
     border-radius: 4px;
+    font-size: 0.95em;
+    background-color: #fff;
 }
 
-/* Results Container for main search */
-#resultsContainer {
-    margin-top: 20px;
-    padding: 25px; /* Increased padding */
-    background-color: #FFFFFF; /* White */
+.filter-status-display {
+    font-size: 0.85em;
+    color: #495057;
+    background-color: #e9ecef;
+    padding: 8px 12px;
     border-radius: 4px;
-    border: 1px solid #DEE2E6; /* Updated border color */
+    text-align: center; 
+    margin-bottom: 15px; 
 }
 
-#resultsContainer h2 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #264653; /* Dark Blue/Green */
-    border-bottom: 1px solid #DEE2E6; /* Lighter border */
-    padding-bottom: 10px;
+
+#searchButton:hover {
+    background-color: #2980b9;
+    transform: translateY(-1px); 
 }
 
-#resultsContainer ul {
+#searchButton:active {
+    transform: translateY(0);
+}
+
+/* Loading & Error & Search Results Area */
+.loading-indicator,
+.error-message-container,
+.search-results-display { 
+    text-align: center;
+    margin-top: 20px; 
+    padding: 15px;   
+    border-radius: 6px;
+}
+
+.loading-indicator p { 
+    color: #17a2b8; 
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+.error-message-container { 
+    color: #721c24; 
+    background-color: #f8d7da; 
+    border: 1px solid #f5c6cb; 
+}
+.error-message-container p { 
+    margin:0;
+}
+
+
+#searchResultsContainer ul.search-results-list {
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin-top: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden; 
 }
 
-#resultsContainer li {
-    padding: 10px 0; /* Increased padding */
-    border-bottom: 1px dashed #CED4DA; /* Slightly darker dashed border for items */
+#searchResultsContainer ul.search-results-list li {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e9ecef; 
+    transition: background-color 0.2s, color 0.2s;
+    font-size: 1.05em;
+    color: #343a40;
+    display: flex; 
+    align-items: center;
+    gap: 10px; 
+}
+#searchResultsContainer ul.search-results-list li input[type="checkbox"].compare-checkbox {
+    margin-left: 8px; 
+    flex-shrink: 0; 
+}
+html[dir="ltr"] #searchResultsContainer ul.search-results-list li input[type="checkbox"].compare-checkbox {
+    margin-right: 8px; 
+    margin-left: 0;
 }
 
-#resultsContainer li:last-child {
+
+#searchResultsContainer ul.search-results-list li:last-child {
     border-bottom: none;
 }
 
-#resultsContainer strong {
-    color: #264653; /* Dark Blue/Green */
-    margin-left: 8px; /* Increased margin */
+#searchResultsContainer ul.search-results-list li:hover {
+    background-color: #e9f5ff; 
+    color: #0056b3; 
+}
+#searchResultsContainer ul.search-results-list li span:hover {
+    text-decoration: underline; 
+    cursor: pointer;
 }
 
-/* General Info Message (can be used by main search or suggestion if needed) */
-.info-message { 
-    color: #075985; /* Darker info blue text */
-    background-color: #E0F2FE; /* Lighter info blue background */
-    border: 1px solid #BAE6FD; /* Lighter info blue border */
-    padding: 12px 15px;
+
+#searchResultsContainer p { 
+    color: #6c757d;
+    font-style: italic;
+    font-size: 1.1em;
+}
+
+/* Comparison Tray Area */
+#comparisonTrayArea {
+    margin-top: 25px;
+    margin-bottom: 25px;
+    padding: 20px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+#comparisonTrayArea h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+#comparisonSelectedList {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 15px;
+    display: flex; 
+    flex-wrap: wrap;
+    gap: 8px;
+}
+#comparisonSelectedList li {
+    background-color: #e9ecef;
+    padding: 5px 10px;
     border-radius: 4px;
-    text-align: center;
-    margin-top: 20px;
+    font-size: 0.9em;
+    color: #495057;
+}
+.comparison-actions { 
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 10px;
+    justify-content: center; 
+}
+.comparison-actions button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s, opacity 0.2s;
 }
 
+#compareSelectedButton {
+    background-color: #28a745; 
+    color: white;
+}
+#compareSelectedButton:disabled {
+    background-color: #6c757d; 
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+#clearComparisonButton {
+    background-color: #dc3545; 
+    color: white;
+}
+#clearComparisonButton:hover {
+    background-color: #c82333;
+}
+#compareSelectedButton:not(:disabled):hover {
+    background-color: #218838;
+}
+
+
+/* Comparison Display Area */
+#comparisonDisplayArea {
+    margin-top: 30px;
+}
+#comparisonDisplayArea h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+#comparisonTableContainer {
+    overflow-x: auto; 
+}
+#comparisonTableContainer .placeholder-text { 
+    color: #6c757d;
+    font-style: italic;
+    font-size: 1.1em;
+    text-align: center;
+    padding: 20px;
+    background-color: #f8f9fa; /* Consistent with tray bg */
+    border: 1px dashed #ced4da; /* Dashed border for placeholder */
+    border-radius: 6px;
+}
+
+table.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 0.95em;
+}
+table.comparison-table th, table.comparison-table td {
+    border: 1px solid #dee2e6;
+    padding: 10px 12px; 
+    text-align: right; 
+    vertical-align: top;
+}
+html[dir="ltr"] table.comparison-table th, 
+html[dir="ltr"] table.comparison-table td {
+    text-align: left;
+}
+table.comparison-table th {
+    background-color: #e9ecef; 
+    color: #212529;
+    font-weight: 600;
+}
+table.comparison-table tbody tr:nth-child(odd) {
+    background-color: #f8f9fa; 
+}
+table.comparison-table tbody tr:hover {
+    background-color: #e2e6ea;
+}
+table.comparison-table td:first-child { 
+    font-weight: bold;
+    color: #495057;
+    white-space: nowrap;
+}
+
+
+/* Microbe Detail Section */
+.microbe-header {
+    text-align: center;
+    margin-bottom: 30px; 
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #ced4da; 
+}
+
+#microbeScientificName {
+    font-size: 2em; 
+    color: #2c3e50;
+    margin-bottom: 8px; 
+}
+
+.rank-display {
+    font-size: 1.15em; 
+    color: #555b61; 
+    font-style: italic;
+}
+
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 25px; 
+}
+
+.main-info-column {
+    flex: 2.5; 
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.sidebar-column {
+    flex: 1.5; 
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.info-card {
+    background-color: #ffffff; 
+    padding: 25px; 
+    border-radius: 8px; 
+    border: 1px solid #dee2e6; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06); 
+}
+
+.info-card h2 {
+    color: #3498db;
+    margin-top: 0;
+    margin-bottom: 20px; 
+    font-size: 1.5em; 
+    border-bottom: 1px solid #e9ecef; 
+    padding-bottom: 12px; 
+}
+
+.info-card p, 
+.info-card div:not(#taxonomyLineage ul):not(#externalLinksList ul):not(.record-item) { /* Avoid double margin for record-item */
+    margin-bottom: 12px; 
+    color: #495057; 
+    line-height: 1.75; 
+}
+.info-card p:last-child, .info-card div:last-child {
+    margin-bottom: 0;
+}
+
+.info-card strong {
+    color: #212529; 
+    font-weight: 600; 
+}
+
+.info-card p > strong {
+    margin-left: 5px; 
+}
+html[dir="ltr"] .info-card p > strong { 
+    margin-right: 5px;
+    margin-left: 0;
+}
+
+/* Styling for Nuccore and BioSample record lists */
+.record-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #f1f3f5; /* Lighter border for items */
+    border-radius: 4px;
+    background-color: #f8f9fa; /* Slight background tint */
+}
+.record-item:last-child {
+    margin-bottom: 0;
+}
+.record-item p {
+    margin-bottom: 5px !important; /* Override general p margin within card */
+    font-size: 0.95em;
+}
+.record-item p.record-title strong { /* Accession label */
+    color: #0056b3; /* Darker blue for accession label */
+}
+.record-item a {
+    color: #2980b9;
+    text-decoration: none;
+}
+.record-item a:hover {
+    text-decoration: underline;
+    color: #1c5a84;
+}
+.record-item ul.attribute-list {
+    list-style-type: none;
+    padding-right: 15px; /* Indent attributes */
+    margin-top: 5px;
+}
+html[dir="ltr"] .record-item ul.attribute-list {
+    padding-left: 15px;
+    padding-right: 0;
+}
+.record-item ul.attribute-list li {
+    font-size: 0.9em;
+    margin-bottom: 3px;
+    color: #495057;
+}
+.record-item ul.attribute-list li strong {
+    color: #343a40;
+}
+
+
+#taxonomyLineage ul, #externalLinksList {
+    list-style-type: none; 
+    padding-right: 0; 
+    margin-top: 5px;
+}
+
+#taxonomyLineage li, #externalLinksList li {
+    margin-bottom: 8px; 
+    padding-right: 20px; 
+    position: relative; 
+    color: #495057;
+}
+#taxonomyLineage li .rank-label { 
+    font-weight: bold;
+    color: #343a40;
+    margin-left: 5px;
+}
+html[dir="ltr"] #taxonomyLineage li .rank-label {
+    margin-right: 5px;
+    margin-left: 0;
+}
+
+#taxonomyLineage li::before, #externalLinksList li::before { 
+    content: "–"; 
+    position: absolute;
+    right: 0;
+    top: 0;
+    color: #3498db; 
+}
+
+#externalLinksList a {
+    color: #2980b9; 
+    text-decoration: none;
+    transition: color 0.2s;
+}
+#externalLinksList a:hover {
+    color: #1c5a84; 
+    text-decoration: underline;
+}
+
+
+#microbeImage {
+    max-width: 100%;
+    height: auto; 
+    border-radius: 6px; 
+    border: 1px solid #ced4da; 
+    margin: 0 auto 10px auto; 
+}
+#noImageText {
+    color: #6c757d;
+    font-style: italic;
+    text-align: center;
+    padding: 10px 0;
+}
 
 /* Footer */
 footer {
     text-align: center;
-    margin-top: 40px; /* Increased margin */
-    padding-top: 25px; /* Increased padding */
-    border-top: 1px solid #DEE2E6; /* Lighter gray border */
-    font-size: 0.9em;
-    color: #6C757D; /* Lighter Gray */
+    margin-top: 45px; 
+    padding-top: 25px;
+    border-top: 1px solid #dee2e6;
+    font-size: 0.95em; 
+    color: #6c757d;
 }
 
 footer a {
-    color: #2A9D8F; /* Teal */
+    color: #3498db;
     text-decoration: none;
+    transition: text-decoration 0.2s;
 }
 
 footer a:hover {
     text-decoration: underline;
 }
 
-/* Spinner styles (for image loading) */
-.loader {
-    border: 5px solid #f3f3f3; /* Light grey */
-    border-top: 5px solid #2A9D8F; /* Teal */
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    margin: 20px auto; 
+/* Utility Classes */
+.hidden {
+    display: none !important; 
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+/* Responsive Layout */
+@media (min-width: 576px) { /* Small devices (landscape phones, 576px and up) */
+    .search-controls {
+        flex-direction: row; 
+        align-items: center;
+        justify-content: center;
+    }
+    .search-area {
+        margin-bottom: 0; 
+        flex-grow: 1; 
+        max-width: 60%; 
+    }
+    .filter-area {
+        justify-content: flex-end; 
+        flex-grow: 1;
+        max-width: 40%;
+    }
+     #gramFilterSelect {
+        min-width: 150px; 
+    }
 }
 
-/* Search History Styles */
-.search-history-container {
-    margin-top: 30px;
-    padding: 20px;
-    background-color: #FFFFFF; /* White background */
-    border: 1px solid #DEE2E6; /* Light gray border, consistent with other elements */
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow */
+
+@media (max-width: 992px) { 
+    .main-info-column {
+        flex: 2;
+    }
+    .sidebar-column {
+        flex: 1;
+    }
 }
 
-.search-history-container h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #264653; /* Dark Blue/Green, consistent with other section titles */
-    font-size: 1.2em;
+@media (max-width: 768px) { 
+    .content-wrapper {
+        flex-direction: column;
+    }
+    .main-info-column, .sidebar-column {
+        flex: none; 
+        width: 100%;
+    }
+    /* Search controls will stack due to default flex-direction: column for .search-controls */
+     .search-area { /* This was already column, ensure it remains so if .search-controls becomes row at a larger size not covered here */
+        flex-direction: column; 
+        align-items: stretch; 
+    }
+    #microbeSearchInput, #searchButton, #gramFilterSelect {
+        max-width: none; 
+        width: 100%;
+    }
+    .filter-area { /* Ensure filter area also stacks properly if not already covered by .search-controls */
+        justify-content: flex-start; 
+        width: 100%; /* Take full width when stacked */
+    }
+    .filter-area label { /* Ensure label and select are reasonably aligned when stacked */
+        margin-bottom: 5px; /* Add some space if they stack on top of each other */
+    }
+
+
+    header h1 {
+        font-size: 1.8em;
+    }
+    #microbeScientificName {
+        font-size: 1.6em;
+    }
+    .info-card h2 {
+        font-size: 1.3em;
+    }
+    table.comparison-table { 
+        font-size: 0.9em;
+    }
+    table.comparison-table th, table.comparison-table td {
+        padding: 8px 10px;
+    }
 }
 
-#searchHistoryList {
-    list-style: none;
-    padding: 0;
-    margin-bottom: 15px;
+@media (max-width: 480px) { 
+    body {
+        padding: 10px;
+        font-size: 15px;
+    }
+    .container {
+        padding: 15px;
+        margin: 15px auto;
+    }
+    header h1 {
+        font-size: 1.6em;
+    }
+    #microbeScientificName {
+        font-size: 1.4em;
+    }
+    .info-card h2 {
+        font-size: 1.2em;
+    }
+    #microbeSearchInput, #searchButton, #gramFilterSelect { 
+        font-size: 1em; 
+        padding: 12px 15px;
+    }
+    #searchButton { 
+        padding: 12px 20px;
+    }
+    table.comparison-table {
+        font-size: 0.85em; 
+    }
+     table.comparison-table th, table.comparison-table td {
+        padding: 6px 8px;
+    }
+    .comparison-actions button { 
+        width: 100%;
+        margin-left: 0; 
+    }
+    .comparison-actions button:not(:last-child) {
+        margin-bottom: 10px; 
+    }
+
 }
 
-#searchHistoryList li {
-    padding: 8px 10px;
-    cursor: pointer;
-    border-bottom: 1px dashed #E0E0E0; /* Light dashed border */
-    color: #2A9D8F; /* Primary Teal color for clickable items */
-    transition: background-color 0.2s ease;
+
+/* RTL specific adjustments */
+html[dir="rtl"] .info-card p > strong {
+    margin-left: 5px; 
+}
+html[dir="rtl"] #taxonomyLineage li, 
+html[dir="rtl"] #externalLinksList li {
+    padding-right: 20px; 
+}
+html[dir="rtl"] #taxonomyLineage li::before, 
+html[dir="rtl"] #externalLinksList li::before {
+    right: 0; 
+    left: auto;
 }
 
-#searchHistoryList li:last-child {
-    border-bottom: none;
+html[dir="rtl"] .record-item ul.attribute-list {
+    padding-right: 15px; /* Indent attributes for RTL */
+    padding-left: 0;
 }
 
-#searchHistoryList li:hover {
-    background-color: #F1F1F1; /* Light hover effect */
-}
-
-#clearHistoryButton {
-    display: block; 
-    margin: 10px auto 0; /* Centered with auto margins */
-    padding: 8px 15px;
-    background-color: #6C757D; /* Secondary gray color */
-    color: white;
-    border: none;
-    border-radius: 4px; /* Standard border-radius */
-    font-size: 0.9em;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-#clearHistoryButton:hover {
-    background-color: #5a6268; /* Darker shade for hover */
-}
+```
