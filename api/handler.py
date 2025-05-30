@@ -414,9 +414,35 @@ def _fetch_single_microbe_details(tax_id):
                 try:
                     root_node_str = f"<BioSampleSet>{biosample_xml_data}</BioSampleSet>" 
                     parsed_biosamples_root = ET.fromstring(root_node_str)
-            for sample_node in parsed_biosamples_root.findall('BioSample'):
-                sample_xml_str = ET.tostring(sample_node, encoding='unicode')
-                parsed_sample_data = parse_biosample_xml(sample_xml_str) # This helper already looks for Gram stain
+                    for sample_node in parsed_biosamples_root.findall('BioSample'): # Moved loop inside try
+                        sample_xml_str = ET.tostring(sample_node, encoding='unicode')
+                        parsed_sample_data = parse_biosample_xml(sample_xml_str) # This helper already looks for Gram stain
+                        
+                        # Stretch goal: Oxygen requirement from BioSample attributes
+                        if not oxygen_requirement_general and parsed_sample_data.get("attributes"):
+                            for attr in parsed_sample_data["attributes"]:
+                                attr_name_lower = attr.get("name", "").lower()
+                                attr_val_lower = attr.get("value", "").lower()
+                                if "oxygen" in attr_name_lower or "aerobic" in attr_name_lower or "anaerobic" in attr_name_lower:
+                                    if "aerobic" in attr_val_lower: oxygen_requirement_general = "Aerobic"
+                                    elif "anaerobic" in attr_val_lower: oxygen_requirement_general = "Anaerobic"
+                                    elif "facultative" in attr_val_lower: oxygen_requirement_general = "Facultative"
+                                    elif "microaerophilic" in attr_val_lower: oxygen_requirement_general = "Microaerophilic"
+                                    break 
+                        
+                        if parsed_sample_data:
+                            result["biosample_info"].append(parsed_sample_data)
+                            if not gram_stain_general and "gram_stain_biosample" in parsed_sample_data:
+                                gram_stain_general = parsed_sample_data["gram_stain_biosample"]
+                except ET.ParseError as pe_multi:
+                    print(f"[BIOSAMPLE_MULTI_PARSE_ERR] XML Parse Error for BioSampleSet TaxID {tax_id}: {pe_multi}")
+                    # Optionally, add a placeholder or error indicator to result["biosample_info"]
+                except Exception as e_bs_parse: # Catch any other error during biosample parsing
+                    print(f"[BIOSAMPLE_GENERIC_PARSE_ERR] Error parsing BioSample XML for TaxID {tax_id}: {e_bs_parse}")
+            
+    
+    # Consolidate Gram stain and Oxygen requirement
+    result["gram_stain_derived"] = gram_stain_general if gram_stain_general else "Not found"
                 
                 # Stretch goal: Oxygen requirement from BioSample attributes
                 if not oxygen_requirement_general and parsed_sample_data.get("attributes"):
