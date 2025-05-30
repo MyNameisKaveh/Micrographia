@@ -2,11 +2,12 @@ from flask import Flask, jsonify, request
 import requests
 import traceback
 import wikipedia
-# from Bio import Entrez # Already imported via configure_entrez_and_patch
 import time
 import os
 import tempfile
-import xml.etree.ElementTree as ET # For parsing XML if Entrez.read doesn't suffice for some details
+import xml.etree.ElementTree as ET 
+import http.client # For IncompleteRead
+# Bio.Entrez is imported in configure_entrez_and_patch
 
 # --- Monkey Patching و پیکربندی Entrez ---
 original_makedirs = os.makedirs
@@ -97,21 +98,44 @@ Entrez = _entrez_module
 app = Flask(__name__)
 GBIF_API_URL_MATCH = "https://api.gbif.org/v1/species/match" # Existing GBIF endpoint
 
-# --- Helper for NCBI API calls ---
-def _ncbi_request_with_retry(func, *args, **kwargs):
-    # Basic retry mechanism, can be expanded
-    retries = 3
-    delay = 0.34 # Adhere to NCBI rate limit (max 3 requests/sec without API key)
-    for i in range(retries):
+# --- Helper for NCBI API calls (Revised) ---
+def _call_entrez_with_retry(action_description, action_func, max_retries=3, base_delay_seconds=0.34):
+    """
+    Wrapper for executing a function that performs NCBI Entrez operations,
+    with retry logic for IncompleteRead and EntrezError.
+    
+    action_description: string, e.g., "fetching taxonomy details for TaxID X"
+    action_func: A no-argument function (e.g., a lambda) that executes the Entrez calls 
+                 (including handle opening, reading, and closing) and returns the parsed result.
+    """
+    last_exception = None
+    for attempt in range(max_retries):
         try:
-            time.sleep(delay) # Wait before each request
-            handle = func(*args, **kwargs)
-            return handle
-        except Exception as e:
-            print(f"[NCBI_REQUEST_ERR] Attempt {i+1} failed: {e}")
-            if i == retries - 1:
-                raise
-            time.sleep(delay * (i + 1)) # Exponential backoff might be too much, simple incremental delay
+            current_delay = base_delay_seconds + (attempt * base_delay_seconds * 2) 
+            time.sleep(current_delay) # Apply delay before each attempt
+            
+            result = action_func()
+            return result
+        except http.client.IncompleteRead as e:
+            last_exception = e
+            print(f"[RETRY_INCOMPLETE_READ] Attempt {attempt + 1}/{max_retries} for {action_description} failed: {e}. Retrying...")
+        except Entrez.EntrezError as e: 
+            last_exception = e
+            print(f"[RETRY_ENTREZ_ERROR] Attempt {attempt + 1}/{max_retries} for {action_description} failed: {e}. Retrying...")
+        except Exception as e: 
+            last_exception = e
+            print(f"[ENTREZ_UNEXPECTED_ERR] Unexpected error during {action_description} on attempt {attempt + 1}: {e}")
+            if attempt >= max_retries -1 : 
+                 break 
+        
+        if attempt >= max_retries - 1: 
+            print(f"[ENTREZ_CALL_FINAL_FAIL] All {max_retries} attempts failed for {action_description}.")
+            break 
+
+    if last_exception:
+        raise last_exception 
+    return None 
+
 
 # --- New NCBI Endpoints ---
 
@@ -141,21 +165,30 @@ def microbe_search_endpoint(): # Renamed to avoid confusion with any potential i
     initial_results_summary = []
     try:
         print(f"[NCBI_SEARCH_FILTER] Searching taxonomy for: {search_term}, Gram filter: {gram_filter}")
-        # Step 1: Initial search by name
-        handle = _ncbi_request_with_retry(Entrez.esearch, db="taxonomy", term=search_term, retmax="30", sort="relevance") # Fetch more initially for filtering
-        search_records = Entrez.read(handle)
-        handle.close()
+        
+        def action_esearch():
+            # This specific Entrez call (esearch) might not typically cause IncompleteRead with Entrez.read
+            # as Entrez.read is straightforward for esearch results.
+            # However, wrapping for consistency and other EntrezErrors.
+            handle = Entrez.esearch(db="taxonomy", term=search_term, retmax="30", sort="relevance")
+            records = Entrez.read(handle)
+            handle.close()
+            return records
+        search_records = _call_entrez_with_retry(f"esearch for '{search_term}'", action_esearch)
 
-        if not search_records["IdList"]:
-            return jsonify([]), 200, COMMON_HEADERS # No initial matches
+        if not search_records or not search_records.get("IdList"):
+            return jsonify([]), 200, COMMON_HEADERS
 
         id_list = search_records["IdList"]
         
-        # Step 2: If no filter or filter is 'any', fetch summaries and return
         if gram_filter == 'any':
-            summary_handle = _ncbi_request_with_retry(Entrez.esummary, db="taxonomy", id=",".join(id_list))
-            summary_records = Entrez.read(summary_handle)
-            summary_handle.close()
+            def action_esummary():
+                handle = Entrez.esummary(db="taxonomy", id=",".join(id_list))
+                records = Entrez.read(handle)
+                handle.close()
+                return records
+            summary_records = _call_entrez_with_retry(f"esummary for {len(id_list)} TaxIDs", action_esummary)
+            
             for record in summary_records:
                 initial_results_summary.append({
                     "scientific_name": record.get("ScientificName", "N/A"),
@@ -269,14 +302,15 @@ def _fetch_single_microbe_details(tax_id):
 
     # 1. Fetch Taxonomic Data
     print(f"[NCBI_DETAIL_FUNC] Fetching taxonomy for TaxID: {tax_id}")
-    tax_handle = _ncbi_request_with_retry(Entrez.efetch, db="taxonomy", id=tax_id, retmode="xml")
-    tax_records = Entrez.read(tax_handle)
-    tax_handle.close()
+    def action_fetch_taxonomy():
+        handle = Entrez.efetch(db="taxonomy", id=tax_id, retmode="xml")
+        records = Entrez.read(handle)
+        handle.close()
+        return records
+    tax_records = _call_entrez_with_retry(f"efetch taxonomy for TaxID {tax_id}", action_fetch_taxonomy)
 
     if not (tax_records and tax_records[0]):
-        # Specific error for this TaxID if no data found
-        raise ValueError(f"Taxonomic details not found for TaxID {tax_id}.") 
-    
+        raise ValueError(f"Taxonomic details not found for TaxID {tax_id}.")
     tax_record = tax_records[0]
     result["scientific_name"] = tax_record.get("ScientificName", "N/A")
     result["rank"] = tax_record.get("Rank", "N/A")
@@ -302,22 +336,26 @@ def _fetch_single_microbe_details(tax_id):
 
     # 2. Find and Fetch Nuccore (Genome) Information
     print(f"[NCBI_DETAIL_FUNC] Fetching linked nuccore for TaxID: {tax_id}")
-    MAX_NUCCORE_RECORDS = 5 # Keep this limit reasonable
-    nuccore_links_handle = _ncbi_request_with_retry(Entrez.elink, dbfrom="taxonomy", db="nuccore", id=tax_id, linkname="taxonomy_nuccore")
-    nuccore_links = Entrez.read(nuccore_links_handle)
-    nuccore_links_handle.close()
+    MAX_NUCCORE_RECORDS = 5
+    
+    def action_link_nuccore():
+        handle = Entrez.elink(dbfrom="taxonomy", db="nuccore", id=tax_id, linkname="taxonomy_nuccore")
+        links = Entrez.read(handle)
+        handle.close()
+        return links
+    nuccore_links = _call_entrez_with_retry(f"elink nuccore for TaxID {tax_id}", action_link_nuccore)
     
     result["genome_info"] = []
-    # Prioritize fetching one representative/reference genome if possible
-    # This is a simplified approach; true reference genome selection is more complex
     if nuccore_links and nuccore_links[0].get("LinkSetDb"):
         nuccore_ids = [link["Id"] for link in nuccore_links[0]["LinkSetDb"][0]["Link"]]
         if nuccore_ids:
-            # Attempt to fetch summaries for all, then look for "reference genome" or "representative genome" in title
-            nuc_summary_handle = _ncbi_request_with_retry(Entrez.esummary, db="nuccore", id=",".join(nuccore_ids[:20])) # Check more to find ref
-            nuc_summaries = Entrez.read(nuc_summary_handle)
-            nuc_summary_handle.close()
-
+            def action_summarize_nuccore():
+                handle = Entrez.esummary(db="nuccore", id=",".join(nuccore_ids[:20])) # Check more to find ref
+                summaries = Entrez.read(handle)
+                handle.close()
+                return summaries
+            nuc_summaries = _call_entrez_with_retry(f"esummary nuccore for {len(nuccore_ids)} IDs (max 20 checked for ref)", action_summarize_nuccore)
+            
             ref_genome_summary = None
             for rec in nuc_summaries:
                 title = rec.get("Title", "").lower()
@@ -349,20 +387,33 @@ def _fetch_single_microbe_details(tax_id):
 
     # 3. Find and Fetch BioSample Information
     print(f"[NCBI_DETAIL_FUNC] Fetching linked biosample for TaxID: {tax_id}")
-    MAX_BIOSAMPLE_RECORDS = 3 # Fewer biosamples, more focused
-    biosample_links_handle = _ncbi_request_with_retry(Entrez.elink, dbfrom="taxonomy", db="biosample", id=tax_id, linkname="taxonomy_biosample")
-    biosample_links = Entrez.read(biosample_links_handle)
-    biosample_links_handle.close()
+    MAX_BIOSAMPLE_RECORDS = 3
+    
+    def action_link_biosample():
+        handle = Entrez.elink(dbfrom="taxonomy", db="biosample", id=tax_id, linkname="taxonomy_biosample")
+        links = Entrez.read(handle)
+        handle.close()
+        return links
+    biosample_links = _call_entrez_with_retry(f"elink biosample for TaxID {tax_id}", action_link_biosample)
 
     result["biosample_info"] = []
     if biosample_links and biosample_links[0].get("LinkSetDb"):
         biosample_ids = [link["Id"] for link in biosample_links[0]["LinkSetDb"][0]["Link"]][:MAX_BIOSAMPLE_RECORDS]
         if biosample_ids:
-            biosample_fetch_handle = _ncbi_request_with_retry(Entrez.efetch, db="biosample", id=",".join(biosample_ids), retmode="xml")
-            biosample_xml_data = biosample_fetch_handle.read()
-            biosample_fetch_handle.close()
-            
-            parsed_biosamples_root = ET.fromstring(f"<BioSampleSet>{biosample_xml_data}</BioSampleSet>")
+            def action_fetch_biosample():
+                handle = Entrez.efetch(db="biosample", id=",".join(biosample_ids), retmode="xml")
+                xml_data = handle.read() 
+                handle.close()
+                return xml_data
+            biosample_xml_data = _call_entrez_with_retry(f"efetch biosample for {len(biosample_ids)} IDs", action_fetch_biosample)
+
+            if biosample_xml_data:
+                if isinstance(biosample_xml_data, bytes):
+                    biosample_xml_data = biosample_xml_data.decode('utf-8')
+                
+                try:
+                    root_node_str = f"<BioSampleSet>{biosample_xml_data}</BioSampleSet>" 
+                    parsed_biosamples_root = ET.fromstring(root_node_str)
             for sample_node in parsed_biosamples_root.findall('BioSample'):
                 sample_xml_str = ET.tostring(sample_node, encoding='unicode')
                 parsed_sample_data = parse_biosample_xml(sample_xml_str) # This helper already looks for Gram stain
@@ -663,23 +714,37 @@ def get_best_ncbi_suggestion_flexible(common_name, max_ids_to_check=5):
         return None
     try:
         search_term = f"{common_name}[Common Name] OR {common_name}[Organism]"
-        handle = _ncbi_request_with_retry(Entrez.esearch, db="taxonomy", term=search_term, retmax=max_ids_to_check, sort="relevance")
-        record = Entrez.read(handle) 
-        handle.close()
-        id_list = record["IdList"]
+        
+        def action_suggest_esearch1():
+            h = Entrez.esearch(db="taxonomy", term=search_term, retmax=max_ids_to_check, sort="relevance")
+            r = Entrez.read(h)
+            h.close()
+            return r
+        record = _call_entrez_with_retry(f"suggest_esearch1 for '{common_name}'", action_suggest_esearch1)
+        id_list = record.get("IdList", [])
+
         if not id_list:
-            handle = _ncbi_request_with_retry(Entrez.esearch, db="taxonomy", term=common_name, retmax=max_ids_to_check, sort="relevance")
-            record = Entrez.read(handle)
-            handle.close()
-            id_list = record["IdList"]
+            def action_suggest_esearch2():
+                h = Entrez.esearch(db="taxonomy", term=common_name, retmax=max_ids_to_check, sort="relevance")
+                r = Entrez.read(h)
+                h.close()
+                return r
+            record = _call_entrez_with_retry(f"suggest_esearch2 for '{common_name}'", action_suggest_esearch2)
+            id_list = record.get("IdList", [])
             if not id_list:
                 print(f"  [NCBI_SUGGEST] No TaxIDs for '{common_name}' after retry.")
                 return None
+        
         ids_to_fetch = id_list[:max_ids_to_check] 
         if not ids_to_fetch: return None
-        summary_handle = _ncbi_request_with_retry(Entrez.esummary, db="taxonomy", id=",".join(ids_to_fetch), retmode="xml")
-        summary_records = Entrez.read(summary_handle)
-        summary_handle.close()
+
+        def action_suggest_esummary():
+            h = Entrez.esummary(db="taxonomy", id=",".join(ids_to_fetch), retmode="xml")
+            r = Entrez.read(h)
+            h.close()
+            return r
+        summary_records = _call_entrez_with_retry(f"suggest_esummary for {len(ids_to_fetch)} IDs", action_suggest_esummary)
+
         candidates = {"species": None, "subspecies": None, "genus": None, "family": None, "other_valid": None}
         for summary_record in summary_records:
             sci_name = summary_record.get("ScientificName")
