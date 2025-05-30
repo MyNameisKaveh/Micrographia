@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const comparisonPlaceholderText = document.getElementById('comparisonPlaceholderText'); // New
     const filterStatus = document.getElementById('filterStatus'); // New
 
-    const API_BASE_URL = "https://micrographia-kavehs-projects-7d3a910a.vercel.app"; 
+    const API_BASE_URL = "https://micrographia-kavehs-projects-7d3a910a.vercel.app";
 
     // --- Global State for Comparison ---
     let selectedForComparison = [];
@@ -163,14 +163,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Display Search Results ---
     function displaySearchResults(results) {
         if (!searchResultsContainer) return;
-        searchResultsContainer.innerHTML = ''; 
+        searchResultsContainer.innerHTML = '';
 
         const ul = document.createElement('ul');
         ul.className = 'search-results-list';
 
         results.forEach(result => {
             const li = document.createElement('li');
-            
+
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.className = 'compare-checkbox';
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
             checkbox.dataset.name = result.scientific_name;
             checkbox.checked = selectedForComparison.some(item => item.tax_id === result.tax_id);
             checkbox.addEventListener('change', handleCompareCheckboxChange);
-            
+
             const nameSpan = document.createElement('span');
             nameSpan.textContent = `${result.scientific_name} (TaxID: ${result.tax_id})`;
             nameSpan.style.cursor = 'pointer';
@@ -240,29 +240,29 @@ document.addEventListener('DOMContentLoaded', () => {
         comparisonCount.textContent = selectedForComparison.length;
         compareSelectedButton.disabled = selectedForComparison.length < 2;
     }
-    
+
 
     // --- Fetch Microbe Details (Single) ---
     async function fetchMicrobeDetails(taxId) {
         showLoading(true);
         hideError();
-        // if (searchResultsContainer) searchResultsContainer.innerHTML = ''; 
-        if (comparisonDisplayArea) comparisonDisplayArea.style.display = 'none'; 
+        // if (searchResultsContainer) searchResultsContainer.innerHTML = '';
+        if (comparisonDisplayArea) comparisonDisplayArea.style.display = 'none';
         if (comparisonPlaceholderText && comparisonTableContainer) { // Manage placeholder
-            comparisonTableContainer.innerHTML = ''; 
+            comparisonTableContainer.innerHTML = '';
             comparisonPlaceholderText.style.display = 'block';
         }
-        
+
         // Clear previous details
         const UIElementsToClear = [
-            microbeScientificName, microbeRank, microbeDescription, ncbiTaxIdSpan, 
-            taxonomyLineage, gramStain, cellShape, oxygenRequirement, 
+            microbeScientificName, microbeRank, microbeDescription, ncbiTaxIdSpan,
+            taxonomyLineage, gramStain, cellShape, oxygenRequirement,
             gcContent, externalLinksList, nuccoreRecordsList, biosampleRecordsList
         ];
         UIElementsToClear.forEach(el => {
             if (el) el.innerHTML = ''; // Clear content
         });
-        
+
         if (microbeImage) {
             microbeImage.src = ''; // Clear src
             microbeImage.style.display = 'none';
@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (microbeScientificName) microbeScientificName.textContent = data.scientific_name || 'N/A';
         if (microbeRank) microbeRank.textContent = data.rank || 'N/A';
-        
+
         if (ncbiTaxIdSpan) { // Make TaxID a link
             ncbiTaxIdSpan.innerHTML = ''; // Clear previous
             if (data.tax_id && data.tax_id !== 'N/A') {
@@ -323,11 +323,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 ncbiTaxIdSpan.textContent = 'N/A';
             }
         }
-        
+
         if (taxonomyLineage) taxonomyLineage.innerHTML = formatLineage(data.lineage);
         if (gramStain) gramStain.textContent = data.gram_stain_derived || 'Not Determined';
         if (oxygenRequirement) oxygenRequirement.textContent = data.oxygen_requirement_derived || 'N/A';
-        
+
         // Populate Nuccore Records
         if (nuccoreRecordsList) {
             nuccoreRecordsList.innerHTML = ''; // Clear previous
@@ -386,16 +386,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 biosampleRecordsList.innerHTML = '<p>No BioSample records found.</p>';
             }
         }
-        
+
         // Summary/Description (placeholder for now)
         if (microbeDescription) microbeDescription.textContent = data.description || "Detailed summary not available from this source.";
-        
+
         // Other placeholders
-        if (cellShape) cellShape.textContent = data.cell_shape || 'N/A'; 
+        if (cellShape) cellShape.textContent = data.cell_shape || 'N/A';
         if (gcContent) gcContent.textContent = data.gc_content || 'N/A'; // Assuming this might be a summary field if available
 
         // Image
-        if (data.image_url && microbeImage) { 
+        if (data.image_url && microbeImage) {
             microbeImage.src = data.image_url;
             microbeImage.alt = `Image of ${data.scientific_name}`;
             microbeImage.style.display = 'block';
@@ -408,7 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // External Links - Keep this for general links if backend adds them
         // The specific NCBI links are now more integrated above.
         if (externalLinksList) {
-            externalLinksList.innerHTML = ''; 
+            externalLinksList.innerHTML = '';
             // Example: if backend provided a generic "ncbi_main_page" link
             if(data.external_links && data.external_links.ncbi_taxonomy) { // This part is hypothetical based on previous thoughts
                  const li = document.createElement('li');
@@ -441,7 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoading(true);
         hideError();
         if (comparisonDisplayArea) comparisonDisplayArea.style.display = 'none';
-        if (microbeDetailSection) microbeDetailSection.style.display = 'none'; 
+        if (microbeDetailSection) microbeDetailSection.style.display = 'none';
         if (comparisonPlaceholderText && comparisonTableContainer) { // Ensure placeholder is hidden before showing table
             comparisonPlaceholderText.style.display = 'none';
         }
@@ -490,11 +490,11 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Comparison fetch error:", error);
         }
     }
-    
+
     // --- Render Comparison Table ---
     function renderComparisonTable(microbeDataList) {
         if (!comparisonTableContainer) return;
-        
+
         if (!microbeDataList || microbeDataList.length === 0) {
             comparisonTableContainer.innerHTML = ''; // Clear any previous table
             if (comparisonPlaceholderText) {
@@ -503,7 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return;
         }
-        
+
         comparisonTableContainer.innerHTML = ''; // Clear placeholder or previous table
         if (comparisonPlaceholderText) comparisonPlaceholderText.style.display = 'none';
 
@@ -545,7 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
             microbeDataList.forEach(microbe => {
                 const cellValue = row.insertCell();
                 // Access nested data safely, e.g. microbe.genomics?.genome_size
-                let value = microbe[feature.key]; 
+                let value = microbe[feature.key];
                 // Special handling for potentially nested or formatted values if any were missed by backend primary_ fields
                 // For now, assuming backend provides primary_genome_size_bp and primary_isolation_source directly
                 cellValue.textContent = (value !== undefined && value !== null && value !== "") ? value : 'N/A';

@@ -9,35 +9,35 @@
 
 body {
     font-family: 'Vazirmatn', 'Roboto', Arial, sans-serif;
-    line-height: 1.7; 
-    background-color: #f8f9fa; 
-    color: #343a40; 
+    line-height: 1.7;
+    background-color: #f8f9fa;
+    color: #343a40;
     direction: rtl;
     padding: 15px;
-    font-size: 16px; 
+    font-size: 16px;
 }
 
 .container {
     max-width: 1200px;
-    margin: 25px auto; 
-    padding: 25px;    
+    margin: 25px auto;
+    padding: 25px;
     background-color: #ffffff;
-    border-radius: 10px; 
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); 
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 /* Header and Search Area */
 header {
     text-align: center;
-    margin-bottom: 35px; 
-    padding-bottom: 25px; 
-    border-bottom: 1px solid #dee2e6; 
+    margin-bottom: 35px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid #dee2e6;
 }
 
 header h1 {
-    font-size: 2.2em; 
-    color: #2c3e50; 
-    margin-bottom: 25px; 
+    font-size: 2.2em;
+    color: #2c3e50;
+    margin-bottom: 25px;
 }
 
 .search-controls {
@@ -50,24 +50,24 @@ header h1 {
 .search-area {
     display: flex;
     /* Default: input and button are full width due to stacking */
-    gap: 10px; 
+    gap: 10px;
 }
 
 #microbeSearchInput {
     flex-grow: 1; /* Take available space */
-    padding: 14px 18px; 
-    border: 1px solid #ced4da; 
-    border-radius: 6px; 
-    font-size: 1.05em; 
+    padding: 14px 18px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 1.05em;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 #microbeSearchInput::placeholder {
-    color: #6c757d; 
+    color: #6c757d;
 }
 
 #microbeSearchInput:focus {
-    border-color: #4dabf7; 
+    border-color: #4dabf7;
     box-shadow: 0 0 0 0.2rem rgba(77, 171, 247, 0.25);
 }
 
@@ -109,14 +109,14 @@ header h1 {
     background-color: #e9ecef;
     padding: 8px 12px;
     border-radius: 4px;
-    text-align: center; 
-    margin-bottom: 15px; 
+    text-align: center;
+    margin-bottom: 15px;
 }
 
 
 #searchButton:hover {
     background-color: #2980b9;
-    transform: translateY(-1px); 
+    transform: translateY(-1px);
 }
 
 #searchButton:active {
@@ -126,25 +126,25 @@ header h1 {
 /* Loading & Error & Search Results Area */
 .loading-indicator,
 .error-message-container,
-.search-results-display { 
+.search-results-display {
     text-align: center;
-    margin-top: 20px; 
-    padding: 15px;   
+    margin-top: 20px;
+    padding: 15px;
     border-radius: 6px;
 }
 
-.loading-indicator p { 
-    color: #17a2b8; 
+.loading-indicator p {
+    color: #17a2b8;
     font-size: 1.1em;
     font-weight: 500;
 }
 
-.error-message-container { 
-    color: #721c24; 
-    background-color: #f8d7da; 
-    border: 1px solid #f5c6cb; 
+.error-message-container {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
 }
-.error-message-container p { 
+.error-message-container p {
     margin:0;
 }
 
@@ -155,25 +155,25 @@ header h1 {
     margin-top: 15px;
     border: 1px solid #e0e0e0;
     border-radius: 6px;
-    overflow: hidden; 
+    overflow: hidden;
 }
 
 #searchResultsContainer ul.search-results-list li {
     padding: 12px 15px;
-    border-bottom: 1px solid #e9ecef; 
+    border-bottom: 1px solid #e9ecef;
     transition: background-color 0.2s, color 0.2s;
     font-size: 1.05em;
     color: #343a40;
-    display: flex; 
+    display: flex;
     align-items: center;
-    gap: 10px; 
+    gap: 10px;
 }
 #searchResultsContainer ul.search-results-list li input[type="checkbox"].compare-checkbox {
-    margin-left: 8px; 
-    flex-shrink: 0; 
+    margin-left: 8px;
+    flex-shrink: 0;
 }
 html[dir="ltr"] #searchResultsContainer ul.search-results-list li input[type="checkbox"].compare-checkbox {
-    margin-right: 8px; 
+    margin-right: 8px;
     margin-left: 0;
 }
 
@@ -183,16 +183,16 @@ html[dir="ltr"] #searchResultsContainer ul.search-results-list li input[type="ch
 }
 
 #searchResultsContainer ul.search-results-list li:hover {
-    background-color: #e9f5ff; 
-    color: #0056b3; 
+    background-color: #e9f5ff;
+    color: #0056b3;
 }
 #searchResultsContainer ul.search-results-list li span:hover {
-    text-decoration: underline; 
+    text-decoration: underline;
     cursor: pointer;
 }
 
 
-#searchResultsContainer p { 
+#searchResultsContainer p {
     color: #6c757d;
     font-style: italic;
     font-size: 1.1em;
@@ -216,7 +216,7 @@ html[dir="ltr"] #searchResultsContainer ul.search-results-list li input[type="ch
     list-style: none;
     padding: 0;
     margin-bottom: 15px;
-    display: flex; 
+    display: flex;
     flex-wrap: wrap;
     gap: 8px;
 }
@@ -227,11 +227,11 @@ html[dir="ltr"] #searchResultsContainer ul.search-results-list li input[type="ch
     font-size: 0.9em;
     color: #495057;
 }
-.comparison-actions { 
+.comparison-actions {
     display: flex;
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
     gap: 10px;
-    justify-content: center; 
+    justify-content: center;
 }
 .comparison-actions button {
     padding: 10px 15px;
@@ -243,16 +243,16 @@ html[dir="ltr"] #searchResultsContainer ul.search-results-list li input[type="ch
 }
 
 #compareSelectedButton {
-    background-color: #28a745; 
+    background-color: #28a745;
     color: white;
 }
 #compareSelectedButton:disabled {
-    background-color: #6c757d; 
+    background-color: #6c757d;
     opacity: 0.65;
     cursor: not-allowed;
 }
 #clearComparisonButton {
-    background-color: #dc3545; 
+    background-color: #dc3545;
     color: white;
 }
 #clearComparisonButton:hover {
@@ -273,16 +273,16 @@ html[dir="ltr"] #searchResultsContainer ul.search-results-list li input[type="ch
     color: #2c3e50;
 }
 #comparisonTableContainer {
-    overflow-x: auto; 
+    overflow-x: auto;
 }
-#comparisonTableContainer .placeholder-text { 
+#comparisonTableContainer .placeholder-text {
     color: #6c757d;
     font-style: italic;
     font-size: 1.1em;
     text-align: center;
     padding: 20px;
-    background-color: #f8f9fa; 
-    border: 1px dashed #ced4da; 
+    background-color: #f8f9fa;
+    border: 1px dashed #ced4da;
     border-radius: 6px;
 }
 
@@ -294,26 +294,26 @@ table.comparison-table {
 }
 table.comparison-table th, table.comparison-table td {
     border: 1px solid #dee2e6;
-    padding: 10px 12px; 
-    text-align: right; 
+    padding: 10px 12px;
+    text-align: right;
     vertical-align: top;
 }
-html[dir="ltr"] table.comparison-table th, 
+html[dir="ltr"] table.comparison-table th,
 html[dir="ltr"] table.comparison-table td {
     text-align: left;
 }
 table.comparison-table th {
-    background-color: #e9ecef; 
+    background-color: #e9ecef;
     color: #212529;
     font-weight: 600;
 }
 table.comparison-table tbody tr:nth-child(odd) {
-    background-color: #f8f9fa; 
+    background-color: #f8f9fa;
 }
 table.comparison-table tbody tr:hover {
     background-color: #e2e6ea;
 }
-table.comparison-table td:first-child { 
+table.comparison-table td:first-child {
     font-weight: bold;
     color: #495057;
     white-space: nowrap;
@@ -323,80 +323,80 @@ table.comparison-table td:first-child {
 /* Microbe Detail Section */
 .microbe-header {
     text-align: center;
-    margin-bottom: 30px; 
+    margin-bottom: 30px;
     padding-bottom: 15px;
-    border-bottom: 1px dashed #ced4da; 
+    border-bottom: 1px dashed #ced4da;
 }
 
 #microbeScientificName {
-    font-size: 2em; 
+    font-size: 2em;
     color: #2c3e50;
-    margin-bottom: 8px; 
+    margin-bottom: 8px;
 }
 
 .rank-display {
-    font-size: 1.15em; 
-    color: #555b61; 
+    font-size: 1.15em;
+    color: #555b61;
     font-style: italic;
 }
 
 .content-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 25px; 
+    gap: 25px;
 }
 
 .main-info-column {
-    flex: 2.5; 
+    flex: 2.5;
     display: flex;
     flex-direction: column;
     gap: 25px;
 }
 
 .sidebar-column {
-    flex: 1.5; 
+    flex: 1.5;
     display: flex;
     flex-direction: column;
     gap: 25px;
 }
 
 .info-card {
-    background-color: #ffffff; 
-    padding: 25px; 
-    border-radius: 8px; 
-    border: 1px solid #dee2e6; 
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06); 
+    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
 }
 
 .info-card h2 {
     color: #3498db;
     margin-top: 0;
-    margin-bottom: 20px; 
-    font-size: 1.5em; 
-    border-bottom: 1px solid #e9ecef; 
-    padding-bottom: 12px; 
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 12px;
 }
 
-.info-card p, 
+.info-card p,
 .info-card div:not(#taxonomyLineage ul):not(#externalLinksList ul):not(.record-item):not(#biosampleRecordsList):not(#nuccoreRecordsList) {
-    margin-bottom: 12px; 
-    color: #495057; 
-    line-height: 1.75; 
+    margin-bottom: 12px;
+    color: #495057;
+    line-height: 1.75;
 }
 .info-card p:last-child, .info-card div:last-child {
     margin-bottom: 0;
 }
 
 .info-card strong { /* General strong tags within info cards */
-    color: #212529; 
-    font-weight: 600; 
+    color: #212529;
+    font-weight: 600;
 }
 
 /* Specific styling for labels of TaxID, Gram Stain etc. if they are in <p><strong>Label:</strong> <span id="value"></span></p> structure */
 .info-card p > strong { /* Targets strong if it's a direct child of p, good for "Label: Value" pairs */
-    margin-left: 5px; 
+    margin-left: 5px;
 }
-html[dir="ltr"] .info-card p > strong { 
+html[dir="ltr"] .info-card p > strong {
     margin-right: 5px;
     margin-left: 0;
 }
@@ -421,12 +421,12 @@ html[dir="ltr"] .info-card p > strong {
     margin-bottom: 0;
 }
 .record-item p {
-    margin-bottom: 6px !important; 
+    margin-bottom: 6px !important;
     font-size: 0.95em;
     line-height: 1.5; /* Adjust line height for record items */
 }
-.record-item p.record-title strong { 
-    color: #0056b3; 
+.record-item p.record-title strong {
+    color: #0056b3;
 }
 .record-item a {
     color: #2980b9;
@@ -439,7 +439,7 @@ html[dir="ltr"] .info-card p > strong {
 }
 .record-item ul.attribute-list {
     list-style-type: none;
-    padding-right: 15px; 
+    padding-right: 15px;
     margin-top: 8px; /* Space above attribute list */
     font-size: 0.9em; /* Smaller font for attributes */
 }
@@ -458,18 +458,18 @@ html[dir="ltr"] .record-item ul.attribute-list {
 
 
 #taxonomyLineage ul, #externalLinksList {
-    list-style-type: none; 
-    padding-right: 0; 
+    list-style-type: none;
+    padding-right: 0;
     margin-top: 5px;
 }
 
 #taxonomyLineage li, #externalLinksList li {
-    margin-bottom: 8px; 
-    padding-right: 20px; 
-    position: relative; 
+    margin-bottom: 8px;
+    padding-right: 20px;
+    position: relative;
     color: #495057;
 }
-#taxonomyLineage li .rank-label { 
+#taxonomyLineage li .rank-label {
     font-weight: bold;
     color: #343a40;
     margin-left: 5px;
@@ -479,31 +479,31 @@ html[dir="ltr"] #taxonomyLineage li .rank-label {
     margin-left: 0;
 }
 
-#taxonomyLineage li::before, #externalLinksList li::before { 
-    content: "–"; 
+#taxonomyLineage li::before, #externalLinksList li::before {
+    content: "–";
     position: absolute;
     right: 0;
     top: 0;
-    color: #3498db; 
+    color: #3498db;
 }
 
 #externalLinksList a {
-    color: #2980b9; 
+    color: #2980b9;
     text-decoration: none;
     transition: color 0.2s;
 }
 #externalLinksList a:hover {
-    color: #1c5a84; 
+    color: #1c5a84;
     text-decoration: underline;
 }
 
 
 #microbeImage {
     max-width: 100%;
-    height: auto; 
-    border-radius: 6px; 
-    border: 1px solid #ced4da; 
-    margin: 0 auto 10px auto; 
+    height: auto;
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    margin: 0 auto 10px auto;
 }
 #noImageText {
     color: #6c757d;
@@ -515,10 +515,10 @@ html[dir="ltr"] #taxonomyLineage li .rank-label {
 /* Footer */
 footer {
     text-align: center;
-    margin-top: 45px; 
+    margin-top: 45px;
     padding-top: 25px;
     border-top: 1px solid #dee2e6;
-    font-size: 0.95em; 
+    font-size: 0.95em;
     color: #6c757d;
 }
 
@@ -534,33 +534,33 @@ footer a:hover {
 
 /* Utility Classes */
 .hidden {
-    display: none !important; 
+    display: none !important;
 }
 
 /* Responsive Layout */
 @media (min-width: 576px) { /* Small devices (landscape phones, 576px and up) */
     .search-controls {
-        flex-direction: row; 
+        flex-direction: row;
         align-items: center;
         justify-content: center;
     }
     .search-area {
-        margin-bottom: 0; 
-        flex-grow: 1; 
-        max-width: 60%; 
+        margin-bottom: 0;
+        flex-grow: 1;
+        max-width: 60%;
     }
     .filter-area {
-        justify-content: flex-end; 
+        justify-content: flex-end;
         flex-grow: 1;
         max-width: 40%;
     }
      #gramFilterSelect {
-        min-width: 150px; 
+        min-width: 150px;
     }
 }
 
 
-@media (max-width: 992px) { 
+@media (max-width: 992px) {
     .main-info-column {
         flex: 2;
     }
@@ -569,28 +569,28 @@ footer a:hover {
     }
 }
 
-@media (max-width: 768px) { 
+@media (max-width: 768px) {
     .content-wrapper {
         flex-direction: column;
     }
     .main-info-column, .sidebar-column {
-        flex: none; 
+        flex: none;
         width: 100%;
     }
-     .search-area { 
-        flex-direction: column; 
-        align-items: stretch; 
+     .search-area {
+        flex-direction: column;
+        align-items: stretch;
     }
     #microbeSearchInput, #searchButton, #gramFilterSelect {
-        max-width: none; 
+        max-width: none;
         width: 100%;
     }
-    .filter-area { 
-        justify-content: flex-start; 
-        width: 100%; 
+    .filter-area {
+        justify-content: flex-start;
+        width: 100%;
     }
-    .filter-area label { 
-        margin-bottom: 5px; 
+    .filter-area label {
+        margin-bottom: 5px;
     }
 
 
@@ -603,7 +603,7 @@ footer a:hover {
     .info-card h2 {
         font-size: 1.3em;
     }
-    table.comparison-table { 
+    table.comparison-table {
         font-size: 0.9em;
     }
     table.comparison-table th, table.comparison-table td {
@@ -621,7 +621,7 @@ footer a:hover {
     }
 }
 
-@media (max-width: 480px) { 
+@media (max-width: 480px) {
     body {
         padding: 10px;
         font-size: 15px;
@@ -639,25 +639,25 @@ footer a:hover {
     .info-card h2 {
         font-size: 1.2em;
     }
-    #microbeSearchInput, #searchButton, #gramFilterSelect { 
-        font-size: 1em; 
+    #microbeSearchInput, #searchButton, #gramFilterSelect {
+        font-size: 1em;
         padding: 12px 15px;
     }
-    #searchButton { 
+    #searchButton {
         padding: 12px 20px;
     }
     table.comparison-table {
-        font-size: 0.85em; 
+        font-size: 0.85em;
     }
      table.comparison-table th, table.comparison-table td {
         padding: 6px 8px;
     }
-    .comparison-actions button { 
+    .comparison-actions button {
         width: 100%;
-        margin-left: 0; 
+        margin-left: 0;
     }
     .comparison-actions button:not(:last-child) {
-        margin-bottom: 10px; 
+        margin-bottom: 10px;
     }
     .record-item p {
         font-size: 0.9em; /* Slightly smaller text in records for very small screens */
@@ -671,20 +671,20 @@ footer a:hover {
 
 /* RTL specific adjustments */
 html[dir="rtl"] .info-card p > strong {
-    margin-left: 5px; 
+    margin-left: 5px;
 }
-html[dir="rtl"] #taxonomyLineage li, 
+html[dir="rtl"] #taxonomyLineage li,
 html[dir="rtl"] #externalLinksList li {
-    padding-right: 20px; 
+    padding-right: 20px;
 }
-html[dir="rtl"] #taxonomyLineage li::before, 
+html[dir="rtl"] #taxonomyLineage li::before,
 html[dir="rtl"] #externalLinksList li::before {
-    right: 0; 
+    right: 0;
     left: auto;
 }
 
 html[dir="rtl"] .record-item ul.attribute-list {
-    padding-right: 15px; 
+    padding-right: 15px;
     padding-left: 0;
 }
 ```
