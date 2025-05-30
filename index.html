@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>کاوشگر اطلاعات موجودات</title> <!-- عنوان تغییر کرد -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>کاوشگر اطلاعات موجودات</h1> <!-- عنوان تغییر کرد -->
+            <p>نام رایج یک موجود را برای دریافت پیشنهاد نام علمی وارد کنید، یا نام علمی آن را برای مشاهده طبقه‌بندی دقیق و تصویر جستجو نمایید.</p> <!-- متن تغییر کرد -->
+        </header>
+
+        <main>
+            <!-- بخش جدید برای پیشنهاد نام علمی -->
+            <div class="suggestion-box">
+                <h2>کمک برای یافتن نام علمی (NCBI)</h2> <!-- عنوان تغییر کرد -->
+                <div class="search-box">
+                    <input type="text" id="commonNameInput" placeholder="مثلاً: Cat یا Lion"> <!-- Placeholder تغییر کرد -->
+                    <button id="suggestNameButton">دریافت پیشنهاد</button>
+                </div>
+                <div id="suggestionLoadingIndicator" style="display: none;">
+                    <p>کمی صبر کنید، در حال یافتن نام علمی...</p> <!-- متن تغییر کرد -->
+                </div>
+                <div id="suggestionResultContainer" style="margin-top: 15px;">
+                    <!-- نتایج پیشنهاد اینجا نمایش داده می‌شوند -->
+                </div>
+            </div>
+
+            <hr class="section-divider"> 
+
+            <!-- بخش جستجوی اصلی (موجود) -->
+            <div class="main-search-box">
+                <h2>کاوش اطلاعات و طبقه‌بندی (GBIF و Wikipedia)</h2> <!-- عنوان تغییر کرد -->
+                <div class="search-box">
+                    <input type="text" id="speciesNameInput" placeholder="مثلاً: Panthera leo یا Homo sapiens"> <!-- Placeholder تغییر کرد -->
+                    <button id="searchButton">جستجو</button>
+                </div>
+                <div id="autocompleteSuggestions" class="autocomplete-suggestions-container"></div> <!-- NEW -->
+            </div>
+
+            <div id="loadingIndicator" style="display: none;">
+                <p>در حال دریافت اطلاعات، لطفاً شکیبا باشید...</p> <!-- متن تغییر کرد -->
+            </div>
+
+            <div id="speciesImageContainer" style="text-align: center; margin-bottom: 20px;">
+                <!-- تصویر اینجا توسط جاوااسکریپت بارگذاری می‌شود -->
+            </div>
+
+            <div id="resultsContainer">
+                <!-- نتایج جستجو اینجا نمایش داده خواهند شد -->
+            </div>
+
+            <div id="errorContainer" style="display: none;">
+                <!-- پیام‌های خطا اینجا نمایش داده خواهند شد -->
+            </div>
+
+            <div class="search-history-container"> <!-- NEW CONTAINER -->
+                <h3>آخرین جستجوها</h3>
+                <ul id="searchHistoryList">
+                    <!-- History items will be populated by JavaScript -->
+                </ul>
+                <button id="clearHistoryButton">پاک کردن تاریخچه</button>
+            </div>
+        </main>
+
+        <footer>
+            <p>ساخته شده با استفاده از 
+                <a href="https://www.gbif.org/developer/summary" target="_blank">GBIF API</a> و 
+                <a href="https://www.ncbi.nlm.nih.gov/books/NBK25497/" target="_blank">NCBI Entrez</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,389 @@
+@import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
+
+/* General Body Styles */
+body {
+    font-family: 'Vazirmatn', 'Roboto', sans-serif;
+    line-height: 1.7;
+    margin: 0;
+    padding: 20px;
+    background-color: #F8F9FA; /* Light Gray */
+    color: #212529; /* Dark Gray */
+    direction: rtl;
+}
+
+.container {
+    max-width: 750px; /* Increased max-width */
+    margin: 30px auto;
+    padding: 25px; /* Increased padding */
+    background-color: #FFFFFF; /* White */
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* More subtle box-shadow */
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #DEE2E6; /* Lighter gray border */
+    padding-bottom: 20px;
+}
+
+header h1 {
+    margin-bottom: 0.5em;
+    color: #264653; /* Dark Blue/Green */
+}
+
+header p {
+    font-size: 0.95em;
+    color: #6C757D; /* Lighter Gray */
+}
+
+main {
+    text-align: right;
+}
+
+/* Styles for both search boxes */
+.search-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-box input[type="text"] {
+    flex-grow: 1;
+    padding: 10px 15px;
+    border: 1px solid #CED4DA; /* Updated border color */
+    border-radius: 4px;
+    font-size: 1em;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Updated transition */
+}
+
+.search-box input[type="text"]:focus {
+    border-color: #2A9D8F; /* Teal border on focus */
+    box-shadow: 0 0 0 0.2rem rgba(42, 157, 143, 0.25); /* Subtle box-shadow on focus */
+}
+
+.search-box button {
+    padding: 10px 20px;
+    background-color: #2A9D8F; /* Teal */
+    color: white;
+    border: none;
+    border-radius: 6px; /* Slightly more rounded */
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+}
+
+.search-box button:hover {
+    background-color: #248B7E; /* Slightly darker Teal for hover */
+    transform: translateY(-1px); /* Subtle lift effect */
+}
+
+.search-box button:active {
+    transform: scale(0.98); /* Click effect */
+}
+
+/* Suggestion Box Specific Styles */
+.suggestion-box {
+    padding: 25px; /* Increased padding */
+    background-color: #FFFFFF; /* White */
+    border: 1px solid #DEE2E6; /* Updated border color */
+    border-radius: 8px;
+    margin-bottom: 25px; 
+}
+
+.suggestion-box h2 {
+    margin-top: 0;
+    color: #264653; /* Dark Blue/Green */
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+#suggestionLoadingIndicator p {
+    color: #007BFF; /* Blue for suggestion loading */
+    text-align: center;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+#suggestionResultContainer p {
+    padding: 12px 15px;
+    border-radius: 4px;
+    margin: 0;
+    text-align: center;
+}
+
+#suggestionResultContainer .suggested-name-success {
+    background-color: #D1FAE5; /* Lighter success green background */
+    border: 1px solid #A7F3D0; /* Lighter success green border */
+    color: #065F46; /* Darker success green text */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#suggestionResultContainer .suggestion-message-info {
+    color: #075985; /* Darker info blue text */
+    background-color: #E0F2FE; /* Lighter info blue background */
+    border: 1px solid #BAE6FD; /* Lighter info blue border */
+}
+
+#suggestionResultContainer .suggestion-message-error {
+    background-color: #FEE2E2; /* Lighter error red background */
+    color: #991B1B; /* Darker error red text */
+    border: 1px solid #FECACA; /* Lighter error red border */
+}
+
+
+.copy-to-main-search-btn {
+    padding: 8px 15px; /* Adjusted padding */
+    background-color: #E9C46A; /* Yellow accent */
+    color: #212529; /* Dark Gray text for better contrast */
+    border: none;
+    border-radius: 6px; /* Slightly more rounded */
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-right: auto; 
+    margin-left: 10px; 
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+}
+
+.copy-to-main-search-btn:hover {
+    background-color: #DFAF5B; /* Darker Yellow for hover */
+    transform: translateY(-1px); /* Subtle lift effect */
+}
+
+.copy-to-main-search-btn:active {
+    transform: scale(0.98); /* Click effect */
+}
+
+/* Divider */
+.section-divider {
+    margin: 35px 0;
+    border: 0;
+    border-top: 1px solid #E9ECEF; /* Lighter divider */
+}
+
+/* Main Search Box Section Title */
+.main-search-box {
+    position: relative; /* For positioning autocomplete suggestions */
+}
+
+.main-search-box h2 {
+    margin-top: 0;
+    color: #264653; /* Dark Blue/Green */
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+/* Autocomplete Suggestions Container for Main Search */
+#autocompleteSuggestions {
+    display: none; /* Hidden by default, shown by JS */
+    position: absolute;
+    background-color: #FFFFFF; /* White */
+    border: 1px solid #DEE2E6; /* Light gray border, from palette */
+    border-top: none; /* Sits directly under the input field's container */
+    max-height: 200px;
+    overflow-y: auto;
+    /* 
+      Width is calc(100% - 2px) relative to .main-search-box, 
+      accounting for its own 1px left and 1px right border.
+      This makes it span the full width of the .main-search-box parent.
+    */
+    width: calc(100% - 2px); 
+    left: 0; /* Align with parent's left edge */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    z-index: 1000; /* To appear above other elements */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 0 0 4px 4px; /* Rounded bottom corners */
+    /*
+      The .search-box (which contains the input) is a sibling element to this one
+      in the DOM structure (both are children of .main-search-box, with #autocompleteSuggestions
+      following .search-box).
+      .search-box has margin-bottom: 20px.
+      To make #autocompleteSuggestions appear directly under the .search-box,
+      this margin needs to be counteracted.
+      Setting margin-top to -20px should pull #autocompleteSuggestions up to be flush 
+      with the bottom of .search-box.
+    */
+    margin-top: -20px; 
+}
+
+/* Individual Autocomplete Suggestion Item (assuming they are divs) */
+#autocompleteSuggestions div {
+    padding: 10px;
+    cursor: pointer;
+    font-size: 0.95em;
+    color: #212529; /* Dark Gray text, from palette */
+    border-bottom: 1px solid #E9ECEF; /* Light separator line, from palette */
+}
+
+#autocompleteSuggestions div:last-child {
+    border-bottom: none; /* No border for the last item */
+}
+
+/* Hover effect for Autocomplete Suggestion Item */
+#autocompleteSuggestions div:hover {
+    background-color: #F8F9FA; /* Light Gray hover, from palette */
+    color: #2A9D8F; /* Teal text on hover for emphasis, from palette */
+}
+
+/* Loading Indicator for main search */
+#loadingIndicator p { 
+    color: #2A9D8F; /* Teal */
+    text-align: center;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+/* Error Container for main search */
+#errorContainer {
+    background-color: #FEE2E2; /* Lighter error red background */
+    color: #991B1B; /* Darker error red text */
+    border: 1px solid #FECACA; /* Lighter error red border */
+    text-align: center;
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 4px;
+}
+
+/* Results Container for main search */
+#resultsContainer {
+    margin-top: 20px;
+    padding: 25px; /* Increased padding */
+    background-color: #FFFFFF; /* White */
+    border-radius: 4px;
+    border: 1px solid #DEE2E6; /* Updated border color */
+}
+
+#resultsContainer h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #264653; /* Dark Blue/Green */
+    border-bottom: 1px solid #DEE2E6; /* Lighter border */
+    padding-bottom: 10px;
+}
+
+#resultsContainer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#resultsContainer li {
+    padding: 10px 0; /* Increased padding */
+    border-bottom: 1px dashed #CED4DA; /* Slightly darker dashed border for items */
+}
+
+#resultsContainer li:last-child {
+    border-bottom: none;
+}
+
+#resultsContainer strong {
+    color: #264653; /* Dark Blue/Green */
+    margin-left: 8px; /* Increased margin */
+}
+
+/* General Info Message (can be used by main search or suggestion if needed) */
+.info-message { 
+    color: #075985; /* Darker info blue text */
+    background-color: #E0F2FE; /* Lighter info blue background */
+    border: 1px solid #BAE6FD; /* Lighter info blue border */
+    padding: 12px 15px;
+    border-radius: 4px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: 40px; /* Increased margin */
+    padding-top: 25px; /* Increased padding */
+    border-top: 1px solid #DEE2E6; /* Lighter gray border */
+    font-size: 0.9em;
+    color: #6C757D; /* Lighter Gray */
+}
+
+footer a {
+    color: #2A9D8F; /* Teal */
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Spinner styles (for image loading) */
+.loader {
+    border: 5px solid #f3f3f3; /* Light grey */
+    border-top: 5px solid #2A9D8F; /* Teal */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto; 
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Search History Styles */
+.search-history-container {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #FFFFFF; /* White background */
+    border: 1px solid #DEE2E6; /* Light gray border, consistent with other elements */
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow */
+}
+
+.search-history-container h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #264653; /* Dark Blue/Green, consistent with other section titles */
+    font-size: 1.2em;
+}
+
+#searchHistoryList {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 15px;
+}
+
+#searchHistoryList li {
+    padding: 8px 10px;
+    cursor: pointer;
+    border-bottom: 1px dashed #E0E0E0; /* Light dashed border */
+    color: #2A9D8F; /* Primary Teal color for clickable items */
+    transition: background-color 0.2s ease;
+}
+
+#searchHistoryList li:last-child {
+    border-bottom: none;
+}
+
+#searchHistoryList li:hover {
+    background-color: #F1F1F1; /* Light hover effect */
+}
+
+#clearHistoryButton {
+    display: block; 
+    margin: 10px auto 0; /* Centered with auto margins */
+    padding: 8px 15px;
+    background-color: #6C757D; /* Secondary gray color */
+    color: white;
+    border: none;
+    border-radius: 4px; /* Standard border-radius */
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#clearHistoryButton:hover {
+    background-color: #5a6268; /* Darker shade for hover */
+}
